@@ -1,6 +1,6 @@
-import React from "react";
-import { View, StyleSheet, Pressable, Text } from "react-native";
 import { router, usePathname } from "expo-router";
+import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 interface BottomTabNavigationProps {
   isSmallScreen?: boolean;
@@ -12,15 +12,15 @@ export default function BottomTabNavigation({
   const pathname = usePathname();
 
   const handleHistoryPress = () => {
-    router.push("history_page");
+    router.push("/history_page");
   };
 
   const handleHomePress = () => {
-    router.push("dashboard_page");
+    router.push("/dashboard_page");
   };
 
   const handleProfilePress = () => {
-    router.push("userprofile_page");
+    router.push("/userprofile_page");
   };
 
   return (
