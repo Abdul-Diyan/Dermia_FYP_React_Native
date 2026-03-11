@@ -1,7 +1,9 @@
 import BottomTabNavigation from "@/components/bottom-tab-navigation";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import { signOut } from "firebase/auth";
+import React, { useEffect, useState } from "react";
 import {
+    Alert,
     Pressable,
     ScrollView,
     StyleSheet,
@@ -10,6 +12,7 @@ import {
     useWindowDimensions,
     View,
 } from "react-native";
+import { auth } from "../config/firebaseConfig";
 
 export default function UserProfilePage() {
   const { width, height } = useWindowDimensions();
@@ -19,6 +22,26 @@ export default function UserProfilePage() {
   const [email, setEmail] = useState("rohaankhuram@gmail.com");
   const [phone, setPhone] = useState("+92-300-1234567");
   const [age, setAge] = useState("22");
+
+  // 1. Fetch the user's real email when the page loads
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user && user.email) {
+      setEmail(user.email);
+    }
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      console.log("User logged out successfully");
+
+      router.push("/landing_page");
+    } catch (error: any) {
+      console.error("Logout error:", error);
+      Alert.alert("Logout Failed", error.message);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -175,10 +198,7 @@ export default function UserProfilePage() {
             isSmallScreen && styles.logoutButtonSmall,
             { opacity: pressed ? 0.8 : 1 },
           ]}
-          onPress={() => {
-            console.log("Logout pressed");
-            router.push("/landing_page");
-          }}
+          onPress={handleLogout}
         >
           <Text
             style={[
