@@ -1,7 +1,9 @@
 import { router } from "expo-router";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import {
     Alert,
+    Platform,
     Pressable,
     ScrollView,
     StyleSheet,
@@ -10,6 +12,7 @@ import {
     useWindowDimensions,
     View,
 } from "react-native";
+import { auth } from "../config/firebaseConfig";
 
 export default function LoginPage() {
   const { width, height } = useWindowDimensions();
@@ -17,6 +20,45 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+
+  const handleLogin = async () => {
+    // Web & Mobile Alert Helper
+    const showAlert = (title: string, message: string) => {
+      if (Platform.OS === "web") {
+        window.alert(`${title}: \n${message}`);
+      } else {
+        Alert.alert(title, message);
+      }
+    };
+
+    // 1. Basic Validation
+    if (!email || !password) {
+      showAlert("Error", "Please enter both email and password.");
+      return;
+    }
+
+    // 2. Talk to Firebase
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+      console.log("Logged in:", userCredential.user.email);
+      showAlert("Success", "Welcome back!");
+
+      // Navigate to the main dashboard or diagnosis page
+      router.push("/dashboard_page");
+    } catch (error: any) {
+      console.error(error);
+      // Give a friendly error message for bad credentials
+      if (error.code === "auth/invalid-credential") {
+        showAlert("Login Failed", "Incorrect email or password.");
+      } else {
+        showAlert("Login Failed", error.message);
+      }
+    }
+  };
 
   return (
     <ScrollView
@@ -98,7 +140,7 @@ export default function LoginPage() {
               remember me
             </Text>
           </Pressable>
-          <Pressable onPress={() => router.push("forgetpassword_page")}>
+          <Pressable onPress={() => router.push("/forgetpassword_page")}>
             <Text
               style={[
                 styles.forgotPassword,
@@ -117,20 +159,7 @@ export default function LoginPage() {
             isSmallScreen && styles.loginButtonSmall,
             { opacity: pressed ? 0.8 : 1 },
           ]}
-          onPress={() => {
-            // Validate credentials
-            if (email === "master" && password === "master") {
-              // Successful login
-              router.push("dashboard_page");
-            } else {
-              // Failed login
-              Alert.alert(
-                "Login Failed",
-                "Invalid username or password. Use 'master' for both.",
-                [{ text: "OK" }]
-              );
-            }
-          }}
+          onPress={handleLogin}
         >
           <Text
             style={[

@@ -1,6 +1,8 @@
 import { router } from "expo-router";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import {
+    Alert,
     Pressable,
     ScrollView,
     StyleSheet,
@@ -9,6 +11,7 @@ import {
     useWindowDimensions,
     View,
 } from "react-native";
+import { auth } from "../config/firebaseConfig";
 
 export default function SignupPage() {
   const { width, height } = useWindowDimensions();
@@ -17,6 +20,31 @@ export default function SignupPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const handleSignup = async () => {
+    if (!email || !password || !username) {
+      Alert.alert("Error", "Please fill in all fields.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match.");
+      return;
+    }
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+      console.log("Registered:", userCredential.user.email);
+      Alert.alert("Success!", "Account created successfully.");
+
+      router.push("/login_page");
+    } catch (error: any) {
+      console.error(error);
+      Alert.alert("Signup Failed", error.message);
+    }
+  };
 
   return (
     <ScrollView
@@ -115,10 +143,7 @@ export default function SignupPage() {
             isSmallScreen && styles.signupButtonSmall,
             { opacity: pressed ? 0.8 : 1 },
           ]}
-          onPress={() => {
-            console.log("Sign up pressed");
-            // Add signup logic here
-          }}
+          onPress={handleSignup}
         >
           <Text
             style={[
@@ -137,7 +162,7 @@ export default function SignupPage() {
           >
             Already have an account?{" "}
           </Text>
-          <Pressable onPress={() => router.push("login_page")}>
+          <Pressable onPress={() => router.push("/login_page")}>
             <Text
               style={[styles.loginLink, isSmallScreen && styles.loginLinkSmall]}
             >
