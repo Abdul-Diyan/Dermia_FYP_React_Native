@@ -1,14 +1,14 @@
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TextInput,
-  Pressable,
-  useWindowDimensions,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    useWindowDimensions,
+    View,
 } from "react-native";
-import { router } from "expo-router";
 
 export default function ForgetPasswordPage() {
   const { width, height } = useWindowDimensions();
@@ -22,7 +22,9 @@ export default function ForgetPasswordPage() {
     >
       {/* Header Section with Blue Background */}
       <View style={[styles.headerSection, { minHeight: height * 0.35 }]}>
-        <Text style={[styles.titleText, isSmallScreen && styles.titleTextSmall]}>
+        <Text
+          style={[styles.titleText, isSmallScreen && styles.titleTextSmall]}
+        >
           Reset Password
         </Text>
         <View style={styles.subtitleContainer}>
@@ -99,15 +101,14 @@ export default function ForgetPasswordPage() {
 
         {/* Back to Login Link */}
         <View style={styles.backToLoginContainer}>
-          <Text style={[styles.backText, isSmallScreen && styles.backTextSmall]}>
+          <Text
+            style={[styles.backText, isSmallScreen && styles.backTextSmall]}
+          >
             Remember password?{" "}
           </Text>
           <Pressable onPress={() => router.push("/login_page")}>
             <Text
-              style={[
-                styles.backLink,
-                isSmallScreen && styles.backLinkSmall,
-              ]}
+              style={[styles.backLink, isSmallScreen && styles.backLinkSmall]}
             >
               Login
             </Text>
