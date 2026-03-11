@@ -1,13 +1,13 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    useWindowDimensions,
-    View,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  useWindowDimensions,
+  View,
 } from "react-native";
 
 export default function SignupPage() {
@@ -137,7 +137,7 @@ export default function SignupPage() {
           >
             Already have an account?{" "}
           </Text>
-          <Pressable onPress={() => router.push("login_page")}>
+          <Pressable onPress={() => router.push("/login_page")}>
             <Text
               style={[styles.loginLink, isSmallScreen && styles.loginLinkSmall]}
             >

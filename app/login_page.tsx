@@ -1,14 +1,14 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    useWindowDimensions,
-    View,
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  useWindowDimensions,
+  View,
 } from "react-native";
 
 export default function LoginPage() {
@@ -98,7 +98,7 @@ export default function LoginPage() {
               remember me
             </Text>
           </Pressable>
-          <Pressable onPress={() => router.push("forgetpassword_page")}>
+          <Pressable onPress={() => router.push("/forgetpassword_page")}>
             <Text
               style={[
                 styles.forgotPassword,
@@ -121,13 +121,13 @@ export default function LoginPage() {
             // Validate credentials
             if (email === "master" && password === "master") {
               // Successful login
-              router.push("dashboard_page");
+              router.push("/dashboard_page");
             } else {
               // Failed login
               Alert.alert(
                 "Login Failed",
                 "Invalid username or password. Use 'master' for both.",
-                [{ text: "OK" }]
+                [{ text: "OK" }],
               );
             }
           }}

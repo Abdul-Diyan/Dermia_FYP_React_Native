@@ -102,7 +102,7 @@ export default function ForgetPasswordPage() {
           <Text style={[styles.backText, isSmallScreen && styles.backTextSmall]}>
             Remember password?{" "}
           </Text>
-          <Pressable onPress={() => router.push("login_page")}>
+          <Pressable onPress={() => router.push("/login_page")}>
             <Text
               style={[
                 styles.backLink,
