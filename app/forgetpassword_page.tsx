@@ -1,19 +1,55 @@
+import { router } from "expo-router";
+import { sendPasswordResetEmail } from "firebase/auth";
 import React, { useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TextInput,
-  Pressable,
-  useWindowDimensions,
+    Alert,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    useWindowDimensions,
+    View,
 } from "react-native";
-import { router } from "expo-router";
+import { auth } from "../config/firebaseConfig";
 
 export default function ForgetPasswordPage() {
   const { width, height } = useWindowDimensions();
   const isSmallScreen = width < 400;
   const [email, setEmail] = useState("");
+
+  const handleResetPassword = async () => {
+    if (!email) {
+      Alert.alert("Error", "Please enter your email address first.");
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+
+      Alert.alert(
+        "Email Sent!",
+        "Check your inbox for a link to reset your password.",
+      );
+
+      router.push("/login_page");
+    } catch (error: any) {
+      if (error.code === "auth/invalid-email") {
+        Alert.alert(
+          "Invalid Email",
+          "Please enter a properly formatted email address (e.g., name@example.com).",
+        );
+      } else if (error.code === "auth/user-not-found") {
+        Alert.alert(
+          "Account Not Found",
+          "We couldn't find an account registered with that email.",
+        );
+      } else {
+        // A generic fallback for any other weird errors
+        Alert.alert("Failed", "Something went wrong. Please try again.");
+      }
+    }
+  };
 
   return (
     <ScrollView
@@ -22,7 +58,9 @@ export default function ForgetPasswordPage() {
     >
       {/* Header Section with Blue Background */}
       <View style={[styles.headerSection, { minHeight: height * 0.35 }]}>
-        <Text style={[styles.titleText, isSmallScreen && styles.titleTextSmall]}>
+        <Text
+          style={[styles.titleText, isSmallScreen && styles.titleTextSmall]}
+        >
           Reset Password
         </Text>
         <View style={styles.subtitleContainer}>
@@ -82,10 +120,7 @@ export default function ForgetPasswordPage() {
             isSmallScreen && styles.resetButtonSmall,
             { opacity: pressed ? 0.8 : 1 },
           ]}
-          onPress={() => {
-            console.log("Reset password pressed");
-            // Add reset password logic here
-          }}
+          onPress={handleResetPassword}
         >
           <Text
             style={[
@@ -99,15 +134,14 @@ export default function ForgetPasswordPage() {
 
         {/* Back to Login Link */}
         <View style={styles.backToLoginContainer}>
-          <Text style={[styles.backText, isSmallScreen && styles.backTextSmall]}>
+          <Text
+            style={[styles.backText, isSmallScreen && styles.backTextSmall]}
+          >
             Remember password?{" "}
           </Text>
-          <Pressable onPress={() => router.push("login_page")}>
+          <Pressable onPress={() => router.push("/login_page")}>
             <Text
-              style={[
-                styles.backLink,
-                isSmallScreen && styles.backLinkSmall,
-              ]}
+              style={[styles.backLink, isSmallScreen && styles.backLinkSmall]}
             >
               Login
             </Text>
