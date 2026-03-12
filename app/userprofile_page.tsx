@@ -3,27 +3,25 @@ import { router } from "expo-router";
 import { signOut } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import {
-    Alert,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    useWindowDimensions,
-    View,
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  useWindowDimensions,
+  View,
 } from "react-native";
 import { auth } from "../config/firebaseConfig";
 
 export default function UserProfilePage() {
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const isSmallScreen = width < 400;
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState("Rohaan Khuram");
   const [email, setEmail] = useState("rohaankhuram@gmail.com");
-  const [phone, setPhone] = useState("+92-300-1234567");
-  const [age, setAge] = useState("22");
 
-  // 1. Fetch the user's real email when the page loads
+  // Fetch the user's real email when the page loads
   useEffect(() => {
     const user = auth.currentUser;
     if (user && user.email) {
@@ -35,7 +33,6 @@ export default function UserProfilePage() {
     try {
       await signOut(auth);
       console.log("User logged out successfully");
-
       router.push("/landing_page");
     } catch (error: any) {
       console.error("Logout error:", error);
@@ -63,7 +60,6 @@ export default function UserProfilePage() {
         </Pressable>
       </View>
 
-      {/* Main Content */}
       <ScrollView
         style={styles.scrollContainer}
         contentContainerStyle={styles.scrollContent}
@@ -82,7 +78,11 @@ export default function UserProfilePage() {
                 isSmallScreen && styles.avatarTextSmall,
               ]}
             >
-              JD
+              {name
+                .split(" ")
+                .map((n) => n[0])
+                .join("")
+                .toUpperCase()}
             </Text>
           </View>
         </View>
@@ -104,7 +104,6 @@ export default function UserProfilePage() {
                 style={[styles.input, isSmallScreen && styles.inputSmall]}
                 value={name}
                 onChangeText={setName}
-                editable={true}
               />
             ) : (
               <Text
@@ -141,54 +140,6 @@ export default function UserProfilePage() {
               </Text>
             )}
           </View>
-
-          {/* Phone */}
-          <View style={styles.inputGroup}>
-            <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
-              Phone
-            </Text>
-            {isEditing ? (
-              <TextInput
-                style={[styles.input, isSmallScreen && styles.inputSmall]}
-                value={phone}
-                onChangeText={setPhone}
-                keyboardType="phone-pad"
-              />
-            ) : (
-              <Text
-                style={[
-                  styles.displayText,
-                  isSmallScreen && styles.displayTextSmall,
-                ]}
-              >
-                {phone}
-              </Text>
-            )}
-          </View>
-
-          {/* Age */}
-          <View style={styles.inputGroup}>
-            <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
-              Age
-            </Text>
-            {isEditing ? (
-              <TextInput
-                style={[styles.input, isSmallScreen && styles.inputSmall]}
-                value={age}
-                onChangeText={setAge}
-                keyboardType="numeric"
-              />
-            ) : (
-              <Text
-                style={[
-                  styles.displayText,
-                  isSmallScreen && styles.displayTextSmall,
-                ]}
-              >
-                {age}
-              </Text>
-            )}
-          </View>
         </View>
 
         {/* Logout Button */}
@@ -211,7 +162,6 @@ export default function UserProfilePage() {
         </Pressable>
       </ScrollView>
 
-      {/* Bottom Tab Navigation */}
       <BottomTabNavigation isSmallScreen={isSmallScreen} />
     </View>
   );
