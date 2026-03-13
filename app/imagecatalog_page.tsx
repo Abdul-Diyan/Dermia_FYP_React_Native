@@ -1,7 +1,12 @@
+import BottomTabNavigation from "@/components/bottom-tab-navigation";
+import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
+    ActivityIndicator,
+    Alert,
     FlatList,
+    Image,
     Pressable,
     ScrollView,
     StyleSheet,
@@ -9,29 +14,98 @@ import {
     useWindowDimensions,
     View,
 } from "react-native";
-import BottomTabNavigation from "@/components/bottom-tab-navigation";
 
 export default function ImageCatalogPage() {
   const { width, height } = useWindowDimensions();
   const isSmallScreen = width < 400;
   const [selectedImage, setSelectedImage] = useState(0);
 
-  // Sample image data with different colors representing different skin conditions
-  const images = [
-    { id: 1, color: "#E8B4B8" }, // Reddish
-    { id: 2, color: "#D4A574" }, // Brownish
-    { id: 3, color: "#C9B5B0" }, // Grayish
-    { id: 4, color: "#E8B4B8" }, // Reddish
-  ];
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Changed to state so we can add real images to it!
+  const [images, setImages] = useState([
+    { id: "1", color: "#E8B4B8", url: null },
+    { id: "2", color: "#D4A574", url: null },
+  ]);
 
   const itemsPerRow = 3;
   const itemSize = (width - 60) / itemsPerRow - 10; // Account for padding and margins
+
+  const pickAndUploadImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.8,
+    });
+
+    if (result.canceled) {
+      return;
+    }
+
+    setIsUploading(true);
+    const imageUri = result.assets[0].uri;
+
+    try {
+      const data = new FormData();
+      data.append("file", {
+        uri: imageUri,
+        type: "image/jpeg",
+        name: `lesion_${Date.now()}.jpg`,
+      } as any);
+
+      const cloudName = process.env.EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME;
+      const uploadPreset = process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+
+      if (!cloudName || !uploadPreset) {
+        throw new Error("Cloudinary environment variables are missing.");
+      }
+
+      data.append("upload_preset", uploadPreset);
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+        {
+          method: "POST",
+          body: data,
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(responseData.error?.message || "Upload failed");
+      }
+
+      const secureImageUrl = responseData.secure_url;
+      console.log("Upload Success! Live URL:", secureImageUrl);
+
+      // Add the new image to our grid
+      setImages((prevImages) => [
+        ...prevImages,
+        {
+          id: Date.now().toString(),
+          color: "transparent",
+          url: secureImageUrl,
+        },
+      ]);
+    } catch (error: any) {
+      console.error("Cloudinary upload failed:", error);
+      Alert.alert("Upload Failed", error.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const renderImageItem = ({
     item,
     index,
   }: {
-    item: { id: number; color: string };
+    item: { id: string; color: string; url: string | null };
     index: number;
   }) => (
     <Pressable
@@ -45,16 +119,26 @@ export default function ImageCatalogPage() {
       ]}
       onPress={() => setSelectedImage(index)}
     >
-      <View
-        style={[
-          styles.imagePlaceholder,
-          {
-            width: itemSize - 6,
-            height: itemSize - 6,
-            backgroundColor: item.color,
-          },
-        ]}
-      />
+      {item.url ? (
+        <Image
+          source={{ uri: item.url }}
+          style={[
+            styles.imagePlaceholder,
+            { width: itemSize - 6, height: itemSize - 6 },
+          ]}
+        />
+      ) : (
+        <View
+          style={[
+            styles.imagePlaceholder,
+            {
+              width: itemSize - 6,
+              height: itemSize - 6,
+              backgroundColor: item.color,
+            },
+          ]}
+        />
+      )}
     </Pressable>
   );
 
@@ -98,14 +182,20 @@ export default function ImageCatalogPage() {
                 height: itemSize,
               },
             ]}
-            onPress={() => console.log("Add image")}
+            onPress={pickAndUploadImage}
+            disabled={isUploading}
           >
-            <Text style={styles.addButtonText}>+</Text>
+            {isUploading ? (
+              <ActivityIndicator color="#FFFFFF" size="large" />
+            ) : (
+              <Text style={styles.addButtonText}>+</Text>
+            )}
           </Pressable>
         </View>
       </ScrollView>
 
       {/* Done Button */}
+      {/* Select Button */}
       <View style={styles.buttonContainer}>
         <Pressable
           style={({ pressed }) => [
@@ -114,8 +204,24 @@ export default function ImageCatalogPage() {
             { opacity: pressed ? 0.8 : 1 },
           ]}
           onPress={() => {
-            console.log("Image selected:", selectedImage);
-            router.back();
+            const selectedUrl = images[selectedImage]?.url;
+
+            // Prevent them from clicking dummy colored boxes
+            if (!selectedUrl) {
+              Alert.alert(
+                "Wait!",
+                "Please upload and select a real image first.",
+              );
+              return;
+            }
+
+            console.log("Sending to model:", selectedUrl);
+
+            // Route to the diagnosis page AND pass the image URL with it!
+            router.push({
+              pathname: "/startdiagnosis_page", // <-- Double check this matches your exact filename!
+              params: { imageUrl: selectedUrl },
+            });
           }}
         >
           <Text
@@ -124,7 +230,7 @@ export default function ImageCatalogPage() {
               isSmallScreen && styles.doneButtonTextSmall,
             ]}
           >
-            Done
+            Select & Analyze
           </Text>
         </Pressable>
       </View>

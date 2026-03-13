@@ -135,7 +135,7 @@ export default function DashboardPage() {
             isSmallScreen && styles.diagnosisButtonSmall,
             { opacity: pressed ? 0.8 : 1 },
           ]}
-          onPress={() => router.push("/startdiagnosis_page")}
+          onPress={() => router.push("/imagecatalog_page")}
         >
           <Text
             style={[
