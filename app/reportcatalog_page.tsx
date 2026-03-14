@@ -1,9 +1,20 @@
 import BottomTabNavigation from "@/components/bottom-tab-navigation";
 import { router } from "expo-router";
-import React, { useState } from "react";
 import {
+    collection,
+    doc,
+    getDocs,
+    limit,
+    orderBy,
+    query,
+    writeBatch,
+} from "firebase/firestore";
+import React, { useEffect, useState } from "react";
+import {
+    ActivityIndicator,
     Alert,
     FlatList,
+    Image,
     Pressable,
     ScrollView,
     StyleSheet,
@@ -11,60 +22,114 @@ import {
     useWindowDimensions,
     View,
 } from "react-native";
+import { auth, db } from "../config/firebaseConfig";
 
 export default function ReportCatalogPage() {
   const { width, height } = useWindowDimensions();
   const isSmallScreen = width < 400;
-  const [reports, setReports] = useState([
-    { id: 1, title: "Sample Report", date: "2024-01-15" },
-    { id: 2, title: "Sample Report", date: "2024-01-10" },
-    { id: 3, title: "Sample Report", date: "2024-01-05" },
-    { id: 4, title: "Sample Report", date: "2023-12-28" },
-  ]);
+
+  const [reports, setReports] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const itemsPerRow = 2;
   const itemSize = (width - 80) / itemsPerRow;
 
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        // Fetch only the 5 most recent reports!
+        const reportsRef = collection(db, "users", user.uid, "reports");
+        const q = query(reportsRef, orderBy("createdAt", "desc"), limit(5));
+        const snapshot = await getDocs(q);
+
+        const fetchedReports: any[] = [];
+        snapshot.forEach((doc) => {
+          fetchedReports.push({ id: doc.id, ...doc.data() });
+        });
+
+        setReports(fetchedReports);
+      } catch (error) {
+        console.error("Error fetching reports:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchReports();
+  }, []);
+
   const handleClearHistory = () => {
     Alert.alert(
       "Clear History",
-      "Are you sure you want to delete all reports?",
+      "Are you sure you want to delete these reports?",
       [
-        { text: "Cancel", onPress: () => {} },
+        { text: "Cancel", onPress: () => {}, style: "cancel" },
         {
           text: "Delete",
-          onPress: () => {
-            setReports([]);
-          },
           style: "destructive",
+          onPress: async () => {
+            try {
+              const user = auth.currentUser;
+              if (!user) return;
+
+              // Batch delete from Firestore
+              const batch = writeBatch(db);
+              reports.forEach((report) => {
+                const reportRef = doc(
+                  db,
+                  "users",
+                  user.uid,
+                  "reports",
+                  report.id,
+                );
+                batch.delete(reportRef);
+              });
+
+              await batch.commit();
+              setReports([]); // Clear UI
+              Alert.alert("Success", "History cleared.");
+            } catch (error) {
+              console.error("Error clearing history:", error);
+              Alert.alert("Error", "Could not clear history.");
+            }
+          },
         },
       ],
     );
   };
 
-  const renderReportItem = ({
-    item,
-    index,
-  }: {
-    item: { id: number; title: string; date: string };
-    index: number;
-  }) => (
+  const renderReportItem = ({ item }: { item: any }) => (
     <Pressable
       style={[
         styles.reportCard,
-        {
-          width: itemSize,
-          height: itemSize,
-        },
+        { width: itemSize, height: itemSize + 40 }, // Added height for the image
         isSmallScreen && styles.reportCardSmall,
       ]}
-      onPress={() => console.log("View report:", item.id)}
+      onPress={() => {
+        // Route to diagnosis page and pass image URL to trigger the smart cache!
+        router.push({
+          pathname: "/startdiagnosis_page",
+          params: { imageUrl: item.imageUrl },
+        });
+      }}
     >
+      {/* Show the actual skin lesion image thumbnail */}
+      {item.imageUrl ? (
+        <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
+      ) : (
+        <View style={[styles.cardImage, { backgroundColor: "#E8B4B8" }]} />
+      )}
+
       <Text
         style={[styles.reportTitle, isSmallScreen && styles.reportTitleSmall]}
+        numberOfLines={1}
       >
-        {item.title}
+        {item.predictedLesionType || "Report"}
       </Text>
+      <Text style={styles.reportDate}>{item.date}</Text>
     </Pressable>
   );
 
@@ -97,12 +162,18 @@ export default function ReportCatalogPage() {
         style={styles.scrollContainer}
         contentContainerStyle={styles.scrollContent}
       >
-        {reports.length > 0 ? (
+        {isLoading ? (
+          <ActivityIndicator
+            size="large"
+            color="#3B9FE5"
+            style={{ marginTop: 50 }}
+          />
+        ) : reports.length > 0 ? (
           <View style={styles.gridContainer}>
             <FlatList
               data={reports}
               renderItem={renderReportItem}
-              keyExtractor={(item) => item.id.toString()}
+              keyExtractor={(item) => item.id}
               numColumns={itemsPerRow}
               scrollEnabled={false}
               columnWrapperStyle={styles.columnWrapper}
@@ -191,25 +262,36 @@ const styles = StyleSheet.create({
   },
   reportCard: {
     backgroundColor: "#FFFFFF",
-    borderWidth: 3,
-    borderColor: "#333333",
+    borderWidth: 2,
+    borderColor: "#3B9FE5",
     borderRadius: 12,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    padding: 10,
+    overflow: "hidden",
   },
   reportCardSmall: {
     borderWidth: 2,
   },
+  cardImage: {
+    width: "100%",
+    height: "60%", // Take up the top portion of the card
+    borderRadius: 8,
+    marginBottom: 8,
+  },
   reportTitle: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: "700",
     color: "#333333",
     textAlign: "center",
   },
   reportTitleSmall: {
-    fontSize: 16,
+    fontSize: 14,
+  },
+  reportDate: {
+    fontSize: 12,
+    color: "#666666",
+    marginTop: 4,
   },
   emptyContainer: {
     flex: 1,

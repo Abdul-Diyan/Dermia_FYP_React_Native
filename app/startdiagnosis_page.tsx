@@ -1,6 +1,14 @@
 import BottomTabNavigation from "@/components/bottom-tab-navigation";
 import { router, useLocalSearchParams } from "expo-router";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
+    addDoc,
+    collection,
+    getDocs,
+    limit,
+    query,
+    serverTimestamp,
+    where,
+} from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
     ActivityIndicator,
@@ -26,50 +34,72 @@ export default function StartDiagnosisPage() {
 
   useEffect(() => {
     const analyzeAndSaveReport = async () => {
-      // 2. Simulate the 3-second ML Model processing time
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-
-      // 3. Generate the Mock Report Data
-      const newReport = {
-        reportId: `REP-${Math.floor(Math.random() * 10000)}`,
-        date: new Date().toLocaleDateString(),
-        imageId: "img_9999", // We will eventually get this from Cloudinary
-        imageUrl: imageUrl || null, // The Cloudinary URL we passed over!
-        predictedLesionType: "Melanoma",
-        modelConfidence: "94.77%",
-        explanation:
-          "The analyzed dermoscopic image exhibits distinct characteristics consistent with malignant melanoma.\nFrom an asymmetry perspective, the lesion shows clear imbalance in both structure and pigmentation across its vertical and horizontal axes.",
-      };
-
-      // 4. Save to Firestore Database securely
       try {
         const user = auth.currentUser;
-        if (user) {
-          // Path: users/{user_id}/reports/{auto_generated_id}
-          const userReportsRef = collection(db, "users", user.uid, "reports");
-
-          await addDoc(userReportsRef, {
-            ...newReport,
-            createdAt: serverTimestamp(), // Firebase time tracking
-          });
-
-          console.log("Success: Report securely saved to Firestore!");
-        } else {
+        if (!user) {
           console.error("Cannot save: No user is currently logged in.");
+          setIsAnalyzing(false);
+          return;
         }
-      } catch (error) {
-        console.error("Failed to save report to Firestore:", error);
-      }
 
-      setReportData(newReport);
-      setIsAnalyzing(false);
+        const userReportsRef = collection(db, "users", user.uid, "reports");
+
+        // 1. CHECK FIRESTORE FOR AN EXISTING REPORT FIRST
+        const q = query(
+          userReportsRef,
+          where("imageUrl", "==", imageUrl),
+          limit(1),
+        );
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          // WE FOUND IT! Load instantly and skip the ML model.
+          console.log("Existing report found! Skipping ML prediction.");
+          const existingData = querySnapshot.docs[0].data();
+
+          setReportData({
+            reportId: querySnapshot.docs[0].id, // Use the real database ID
+            ...existingData,
+          });
+          setIsAnalyzing(false);
+          return; // Exit the function early!
+        }
+
+        // 2. NO EXISTING REPORT FOUND. Simulate the ML Model processing time.
+        console.log("No previous report found. Running AI analysis...");
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+
+        // Generate the Mock Report Data
+        const newReport = {
+          date: new Date().toLocaleDateString(),
+          imageId: "img_" + Math.floor(Math.random() * 1000),
+          imageUrl: imageUrl || null,
+          predictedLesionType: "Melanoma",
+          modelConfidence: "94.77%",
+          explanation:
+            "The analyzed dermoscopic image exhibits distinct characteristics consistent with malignant melanoma.\nFrom an asymmetry perspective, the lesion shows clear imbalance in both structure and pigmentation across its vertical and horizontal axes.",
+        };
+
+        // Save to Firestore Database securely
+        const docRef = await addDoc(userReportsRef, {
+          ...newReport,
+          createdAt: serverTimestamp(),
+        });
+
+        console.log("Success: New report securely saved to Firestore!");
+
+        // Update UI with the new report (and attach the real Firebase document ID)
+        setReportData({ ...newReport, reportId: docRef.id });
+        setIsAnalyzing(false);
+      } catch (error) {
+        console.error("Failed to process report:", error);
+        setIsAnalyzing(false);
+      }
     };
 
-    // Only run the analysis if we actually received an image URL
     if (imageUrl) {
       analyzeAndSaveReport();
     } else {
-      // Fallback if someone opens the page directly without an image
       setIsAnalyzing(false);
     }
   }, [imageUrl]);

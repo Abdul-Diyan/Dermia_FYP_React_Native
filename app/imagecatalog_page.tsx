@@ -1,7 +1,17 @@
 import BottomTabNavigation from "@/components/bottom-tab-navigation";
 import * as ImagePicker from "expo-image-picker";
-import { router } from "expo-router";
-import React, { useState } from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import {
+    addDoc,
+    collection,
+    deleteDoc,
+    doc,
+    getDocs,
+    orderBy,
+    query,
+    serverTimestamp,
+} from "firebase/firestore";
+import React, { useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -14,22 +24,53 @@ import {
     useWindowDimensions,
     View,
 } from "react-native";
+import { auth, db } from "../config/firebaseConfig";
 
 export default function ImageCatalogPage() {
   const { width, height } = useWindowDimensions();
   const isSmallScreen = width < 400;
-  const [selectedImage, setSelectedImage] = useState(0);
 
+  // Catch the mode ("manage", "select", or "upload")
+  const { mode } = useLocalSearchParams<{ mode: string }>();
+
+  const [images, setImages] = useState<any[]>([]);
+  const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-
-  // Changed to state so we can add real images to it!
-  const [images, setImages] = useState([
-    { id: "1", color: "#E8B4B8", url: null },
-    { id: "2", color: "#D4A574", url: null },
-  ]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const itemsPerRow = 3;
-  const itemSize = (width - 60) / itemsPerRow - 10; // Account for padding and margins
+  const itemSize = (width - 60) / itemsPerRow - 10;
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const imagesRef = collection(db, "users", user.uid, "images");
+        const q = query(imagesRef, orderBy("createdAt", "desc"));
+        const snapshot = await getDocs(q);
+
+        const fetchedImages: any[] = [];
+        snapshot.forEach((doc) => {
+          fetchedImages.push({ id: doc.id, ...doc.data() });
+        });
+
+        setImages(fetchedImages);
+      } catch (error) {
+        console.error("Error fetching images:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchImages();
+
+    // Auto-open gallery if they clicked "Upload New Photo" on dashboard
+    if (mode === "upload") {
+      pickAndUploadImage();
+    }
+  }, [mode]);
 
   const pickAndUploadImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -39,9 +80,7 @@ export default function ImageCatalogPage() {
       quality: 0.8,
     });
 
-    if (result.canceled) {
-      return;
-    }
+    if (result.canceled) return;
 
     setIsUploading(true);
     const imageUri = result.assets[0].uri;
@@ -53,18 +92,13 @@ export default function ImageCatalogPage() {
         type: "image/jpeg",
         name: `lesion_${Date.now()}.jpg`,
       } as any);
-
-      const cloudName = process.env.EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME;
-      const uploadPreset = process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-
-      if (!cloudName || !uploadPreset) {
-        throw new Error("Cloudinary environment variables are missing.");
-      }
-
-      data.append("upload_preset", uploadPreset);
+      data.append(
+        "upload_preset",
+        process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET!,
+      );
 
       const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+        `https://api.cloudinary.com/v1_1/${process.env.EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
         {
           method: "POST",
           body: data,
@@ -76,48 +110,94 @@ export default function ImageCatalogPage() {
       );
 
       const responseData = await response.json();
-
-      if (!response.ok) {
+      if (!response.ok)
         throw new Error(responseData.error?.message || "Upload failed");
-      }
 
       const secureImageUrl = responseData.secure_url;
-      console.log("Upload Success! Live URL:", secureImageUrl);
 
-      // Add the new image to our grid
-      setImages((prevImages) => [
-        ...prevImages,
-        {
-          id: Date.now().toString(),
-          color: "transparent",
+      // Save to Firestore
+      const user = auth.currentUser;
+      let newDocId = Date.now().toString();
+
+      if (user) {
+        const imagesRef = collection(db, "users", user.uid, "images");
+        const docRef = await addDoc(imagesRef, {
           url: secureImageUrl,
-        },
-      ]);
+          createdAt: serverTimestamp(),
+        });
+        newDocId = docRef.id;
+      }
+
+      setImages((prev) => [{ id: newDocId, url: secureImageUrl }, ...prev]);
+
+      // If uploading for a new diagnosis, jump straight to the diagnosis page
+      if (mode === "upload") {
+        router.push({
+          pathname: "/startdiagnosis_page",
+          params: { imageUrl: secureImageUrl },
+        });
+      } else {
+        Alert.alert("Success", "Image saved to your catalog!");
+      }
     } catch (error: any) {
-      console.error("Cloudinary upload failed:", error);
+      console.error("Upload error:", error);
       Alert.alert("Upload Failed", error.message);
     } finally {
       setIsUploading(false);
     }
   };
 
-  const renderImageItem = ({
-    item,
-    index,
-  }: {
-    item: { id: string; color: string; url: string | null };
-    index: number;
-  }) => (
+  const handleImagePress = (item: any) => {
+    if (mode === "manage") {
+      Alert.alert(
+        "Image Options",
+        "What would you like to do with this image?",
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: () => deleteImage(item.id),
+          },
+          {
+            text: "Diagnose",
+            onPress: () =>
+              router.push({
+                pathname: "/startdiagnosis_page",
+                params: { imageUrl: item.url },
+              }),
+          },
+        ],
+      );
+    } else {
+      setSelectedImageId(item.id);
+    }
+  };
+
+  const deleteImage = async (docId: string) => {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        await deleteDoc(doc(db, "users", user.uid, "images", docId));
+        setImages((prev) => prev.filter((img) => img.id !== docId));
+        Alert.alert("Deleted", "Image removed from your catalog.");
+      }
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      Alert.alert("Error", "Could not delete image.");
+    }
+  };
+
+  const renderImageItem = ({ item }: { item: any }) => (
     <Pressable
       style={[
         styles.imageItem,
-        {
-          width: itemSize,
-          height: itemSize,
-        },
-        selectedImage === index && styles.imageItemSelected,
+        { width: itemSize, height: itemSize },
+        selectedImageId === item.id &&
+          mode !== "manage" &&
+          styles.imageItemSelected,
       ]}
-      onPress={() => setSelectedImage(index)}
+      onPress={() => handleImagePress(item)}
     >
       {item.url ? (
         <Image
@@ -134,7 +214,7 @@ export default function ImageCatalogPage() {
             {
               width: itemSize - 6,
               height: itemSize - 6,
-              backgroundColor: item.color,
+              backgroundColor: item.color || "#E8B4B8",
             },
           ]}
         />
@@ -152,7 +232,7 @@ export default function ImageCatalogPage() {
         <Text
           style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
         >
-          Select Image
+          {mode === "manage" ? "Image Catalog" : "Select Image"}
         </Text>
         <View style={{ width: 50 }} />
       </View>
@@ -162,78 +242,76 @@ export default function ImageCatalogPage() {
         style={styles.scrollContainer}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Images Grid */}
         <View style={styles.gridContainer}>
-          <FlatList
-            data={images}
-            renderItem={renderImageItem}
-            keyExtractor={(item) => item.id.toString()}
-            numColumns={itemsPerRow}
-            scrollEnabled={false}
-            columnWrapperStyle={styles.columnWrapper}
-          />
-
-          {/* Add Image Button */}
-          <Pressable
-            style={[
-              styles.addButton,
-              {
-                width: itemSize,
-                height: itemSize,
-              },
-            ]}
-            onPress={pickAndUploadImage}
-            disabled={isUploading}
-          >
-            {isUploading ? (
-              <ActivityIndicator color="#FFFFFF" size="large" />
-            ) : (
-              <Text style={styles.addButtonText}>+</Text>
-            )}
-          </Pressable>
+          {isLoading ? (
+            <ActivityIndicator
+              size="large"
+              color="#3B9FE5"
+              style={{ marginTop: 50 }}
+            />
+          ) : (
+            <>
+              <FlatList
+                data={images}
+                renderItem={renderImageItem}
+                keyExtractor={(item) => item.id}
+                numColumns={itemsPerRow}
+                scrollEnabled={false}
+                columnWrapperStyle={styles.columnWrapper}
+              />
+              <Pressable
+                style={[
+                  styles.addButton,
+                  { width: itemSize, height: itemSize },
+                ]}
+                onPress={pickAndUploadImage}
+                disabled={isUploading}
+              >
+                {isUploading ? (
+                  <ActivityIndicator color="#FFFFFF" size="large" />
+                ) : (
+                  <Text style={styles.addButtonText}>+</Text>
+                )}
+              </Pressable>
+            </>
+          )}
         </View>
       </ScrollView>
 
-      {/* Done Button */}
-      {/* Select Button */}
-      <View style={styles.buttonContainer}>
-        <Pressable
-          style={({ pressed }) => [
-            styles.doneButton,
-            isSmallScreen && styles.doneButtonSmall,
-            { opacity: pressed ? 0.8 : 1 },
-          ]}
-          onPress={() => {
-            const selectedUrl = images[selectedImage]?.url;
-
-            // Prevent them from clicking dummy colored boxes
-            if (!selectedUrl) {
-              Alert.alert(
-                "Wait!",
-                "Please upload and select a real image first.",
-              );
-              return;
-            }
-
-            console.log("Sending to model:", selectedUrl);
-
-            // Route to the diagnosis page AND pass the image URL with it!
-            router.push({
-              pathname: "/startdiagnosis_page", // <-- Double check this matches your exact filename!
-              params: { imageUrl: selectedUrl },
-            });
-          }}
-        >
-          <Text
-            style={[
-              styles.doneButtonText,
-              isSmallScreen && styles.doneButtonTextSmall,
+      {/* Select Button (Hidden in Manage mode) */}
+      {mode !== "manage" && (
+        <View style={styles.buttonContainer}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.doneButton,
+              isSmallScreen && styles.doneButtonSmall,
+              { opacity: pressed ? 0.8 : 1 },
             ]}
+            onPress={() => {
+              const selectedObj = images.find(
+                (img) => img.id === selectedImageId,
+              );
+              if (!selectedObj) {
+                Alert.alert("Wait!", "Please select an image first.");
+                return;
+              }
+              router.push({
+                pathname: "/startdiagnosis_page",
+                params: { imageUrl: selectedObj.url },
+              });
+            }}
           >
-            Select & Analyze
-          </Text>
-        </Pressable>
-      </View>
+            <Text
+              style={[
+                styles.doneButtonText,
+                isSmallScreen && styles.doneButtonTextSmall,
+              ]}
+            >
+              Select & Analyze
+            </Text>
+          </Pressable>
+        </View>
+      )}
 
       {/* Bottom Tab Navigation */}
       <BottomTabNavigation isSmallScreen={isSmallScreen} />
@@ -289,7 +367,9 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   columnWrapper: {
-    justifyContent: "space-between",
+    flexWrap: "wrap",
+    justifyContent: "flex-start", // <-- Changed from space-between
+    gap: 15, // <-- Added a slight gap so they don't touch
     marginBottom: 16,
   },
   imageItem: {

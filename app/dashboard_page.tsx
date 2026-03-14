@@ -1,7 +1,11 @@
 import BottomTabNavigation from "@/components/bottom-tab-navigation";
-import { router } from "expo-router";
-import React from "react";
+import { router, useFocusEffect } from "expo-router";
+import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
+import React, { useCallback, useState } from "react";
 import {
+    ActivityIndicator,
+    Alert,
+    Image,
     Pressable,
     ScrollView,
     StyleSheet,
@@ -9,10 +13,63 @@ import {
     useWindowDimensions,
     View,
 } from "react-native";
+import { auth, db } from "../config/firebaseConfig";
 
 export default function DashboardPage() {
   const { width, height } = useWindowDimensions();
   const isSmallScreen = width < 400;
+
+  const [recentImages, setRecentImages] = useState<any[]>([]);
+  const [recentReports, setRecentReports] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // useFocusEffect runs every time this screen becomes the active screen
+  useFocusEffect(
+    useCallback(() => {
+      const fetchDashboardData = async () => {
+        try {
+          const user = auth.currentUser;
+          if (!user) return;
+
+          // 1. Fetch the 3 most recent images
+          const imagesRef = collection(db, "users", user.uid, "images");
+          const qImages = query(
+            imagesRef,
+            orderBy("createdAt", "desc"),
+            limit(3),
+          );
+          const imageSnap = await getDocs(qImages);
+
+          const fetchedImages: any[] = [];
+          imageSnap.forEach((doc) =>
+            fetchedImages.push({ id: doc.id, ...doc.data() }),
+          );
+          setRecentImages(fetchedImages);
+
+          // 2. Fetch the 2 most recent reports
+          const reportsRef = collection(db, "users", user.uid, "reports");
+          const qReports = query(
+            reportsRef,
+            orderBy("createdAt", "desc"),
+            limit(2),
+          );
+          const reportSnap = await getDocs(qReports);
+
+          const fetchedReports: any[] = [];
+          reportSnap.forEach((doc) =>
+            fetchedReports.push({ id: doc.id, ...doc.data() }),
+          );
+          setRecentReports(fetchedReports);
+        } catch (error) {
+          console.error("Error fetching dashboard data:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchDashboardData();
+    }, []),
+  );
 
   return (
     <View style={styles.container}>
@@ -31,103 +88,136 @@ export default function DashboardPage() {
         contentContainerStyle={styles.scrollContent}
       >
         {/* Browse Images Section */}
-        <View style={[styles.section, isSmallScreen && styles.sectionSmall]}>
-          <Text
-            style={[
-              styles.sectionTitle,
-              isSmallScreen && styles.sectionTitleSmall,
-            ]}
-          >
-            Browse Images
-          </Text>
-          <View
-            style={[
-              styles.cardContainer,
-              isSmallScreen && styles.cardContainerSmall,
-            ]}
-          >
-            <View style={styles.imageWrapper}>
-              <View
-                style={[
-                  styles.imagePlaceholder,
-                  isSmallScreen && styles.imagePlaceholderSmall,
-                ]}
-              />
+        <View
+          style={[
+            styles.cardContainer,
+            isSmallScreen && styles.cardContainerSmall,
+          ]}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#3B9FE5" />
+          ) : (
+            <View style={styles.imageGridRow}>
+              {recentImages.length > 0 ? (
+                recentImages.map((img) => (
+                  <Image
+                    key={img.id}
+                    source={{ uri: img.url }}
+                    style={[
+                      styles.liveThumbnail,
+                      isSmallScreen && styles.liveThumbnailSmall,
+                    ]}
+                  />
+                ))
+              ) : (
+                // The Visual Empty State for Images
+                <Pressable
+                  style={[
+                    styles.emptyPlaceholderCard,
+                    isSmallScreen && styles.emptyPlaceholderCardSmall,
+                  ]}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/imagecatalog_page",
+                      params: { mode: "upload" },
+                    })
+                  }
+                >
+                  <Text style={styles.emptyIcon}>📷</Text>
+                  <Text style={styles.emptyPromptText}>Add Photo</Text>
+                </Pressable>
+              )}
             </View>
-            <Pressable onPress={() => router.push("/imagecatalog_page")}>
-              <Text
-                style={[
-                  styles.viewAllLink,
-                  isSmallScreen && styles.viewAllLinkSmall,
-                ]}
-              >
-                View all
-              </Text>
-            </Pressable>
-          </View>
+          )}
+
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: "/imagecatalog_page",
+                params: { mode: "manage" },
+              })
+            }
+          >
+            <Text
+              style={[
+                styles.viewAllLink,
+                isSmallScreen && styles.viewAllLinkSmall,
+              ]}
+            >
+              View all
+            </Text>
+          </Pressable>
         </View>
 
         {/* Previous Report History Section */}
-        <View style={[styles.section, isSmallScreen && styles.sectionSmall]}>
-          <Text
-            style={[
-              styles.sectionTitle,
-              isSmallScreen && styles.sectionTitleSmall,
-            ]}
-          >
-            Previous report history
-          </Text>
-          <View
-            style={[
-              styles.cardContainer,
-              isSmallScreen && styles.cardContainerSmall,
-            ]}
-          >
+        <View
+          style={[
+            styles.cardContainer,
+            isSmallScreen && styles.cardContainerSmall,
+          ]}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#3B9FE5" />
+          ) : (
             <View style={styles.reportsWrapper}>
-              <View
-                style={[
-                  styles.reportCard,
-                  isSmallScreen && styles.reportCardSmall,
-                ]}
-              >
-                <Text
+              {recentReports.length > 0 ? (
+                recentReports.map((report) => (
+                  <Pressable
+                    key={report.id}
+                    style={[
+                      styles.reportCard,
+                      isSmallScreen && styles.reportCardSmall,
+                    ]}
+                    onPress={() =>
+                      router.push({
+                        pathname: "/startdiagnosis_page",
+                        params: { imageUrl: report.imageUrl },
+                      })
+                    }
+                  >
+                    <Text
+                      style={[
+                        styles.reportText,
+                        isSmallScreen && styles.reportTextSmall,
+                      ]}
+                      numberOfLines={1}
+                    >
+                      {report.predictedLesionType || "Report"}
+                    </Text>
+                    <Text style={styles.reportConfidenceText}>
+                      {report.modelConfidence
+                        ? `Conf: ${report.modelConfidence}`
+                        : "View Details"}
+                    </Text>
+                  </Pressable>
+                ))
+              ) : (
+                // The Visual Empty State for Reports
+                <Pressable
                   style={[
-                    styles.reportText,
-                    isSmallScreen && styles.reportTextSmall,
+                    styles.emptyPlaceholderCard,
+                    styles.emptyReportCard,
+                    isSmallScreen && styles.reportCardSmall,
                   ]}
                 >
-                  Sample{"\n"}Report
-                </Text>
-              </View>
-              <View
-                style={[
-                  styles.reportCard,
-                  isSmallScreen && styles.reportCardSmall,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.reportText,
-                    isSmallScreen && styles.reportTextSmall,
-                  ]}
-                >
-                  Sample{"\n"}Report
-                </Text>
-              </View>
+                  <Text style={styles.emptyIcon}>🔬</Text>
+                  <Text style={styles.emptyPromptText}>No Scans Yet</Text>
+                </Pressable>
+              )}
             </View>
-            <Pressable onPress={() => router.push("/reportcatalog_page")}>
-              <Text
-                style={[
-                  styles.viewAllLink,
-                  isSmallScreen && styles.viewAllLinkSmall,
-                ]}
-              >
-                View all
-              </Text>
-            </Pressable>
-          </View>
-        </View>
+          )}
 
+          <Pressable onPress={() => router.push("/reportcatalog_page")}>
+            <Text
+              style={[
+                styles.viewAllLink,
+                isSmallScreen && styles.viewAllLinkSmall,
+              ]}
+            >
+              View all
+            </Text>
+          </Pressable>
+        </View>
         {/* Start Diagnosis Button */}
         <Pressable
           style={({ pressed }) => [
@@ -135,7 +225,31 @@ export default function DashboardPage() {
             isSmallScreen && styles.diagnosisButtonSmall,
             { opacity: pressed ? 0.8 : 1 },
           ]}
-          onPress={() => router.push("/imagecatalog_page")}
+          onPress={() => {
+            Alert.alert(
+              "Start Diagnosis",
+              "How would you like to provide the image?",
+              [
+                { text: "Cancel", style: "cancel" },
+                {
+                  text: "Previous Scan",
+                  onPress: () =>
+                    router.push({
+                      pathname: "/imagecatalog_page",
+                      params: { mode: "select" },
+                    }),
+                },
+                {
+                  text: "Upload New Photo",
+                  onPress: () =>
+                    router.push({
+                      pathname: "/imagecatalog_page",
+                      params: { mode: "upload" },
+                    }),
+                },
+              ],
+            );
+          }}
         >
           <Text
             style={[
@@ -292,5 +406,59 @@ const styles = StyleSheet.create({
   },
   diagnosisButtonTextSmall: {
     fontSize: 15,
+  },
+  imageGridRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 12,
+    width: "100%",
+    marginBottom: 16,
+  },
+  liveThumbnail: {
+    width: 80,
+    height: 80,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+  },
+  liveThumbnailSmall: {
+    width: 65,
+    height: 65,
+  },
+  reportConfidenceText: {
+    fontSize: 12,
+    color: "#666",
+    marginTop: 4,
+    fontWeight: "500",
+  },
+  // --- Empty State Styles ---
+  emptyPlaceholderCard: {
+    width: 100,
+    height: 100,
+    borderWidth: 2,
+    borderColor: "#CCC",
+    borderStyle: "dashed",
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FAFAFA",
+  },
+  emptyPlaceholderCardSmall: {
+    width: 80,
+    height: 80,
+  },
+  emptyReportCard: {
+    width: 140,
+    height: 120,
+  },
+  emptyIcon: {
+    fontSize: 28,
+    marginBottom: 4,
+  },
+  emptyPromptText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#999",
+    textAlign: "center",
   },
 });
