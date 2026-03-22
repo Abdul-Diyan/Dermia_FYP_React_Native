@@ -1,74 +1,119 @@
+import BottomTabNavigation from "@/components/bottom-tab-navigation";
+import { router } from "expo-router";
 import React from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
   Pressable,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  useColorScheme,
   useWindowDimensions,
+  View,
 } from "react-native";
-import { router } from "expo-router";
-import BottomTabNavigation from "@/components/bottom-tab-navigation";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HistoryPage() {
   const { width, height } = useWindowDimensions();
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
   const isSmallScreen = width < 400;
+
+  // Dynamic status bar colors
+  const topBarColor = isDarkMode ? "#000000" : "#FFFFFF";
+  const topBarTextStyle = isDarkMode ? "light-content" : "dark-content";
 
   const historyItems = [
     { id: 1, date: "2024-01-15", condition: "Acne", severity: "Moderate" },
     { id: 2, date: "2024-01-10", condition: "Eczema", severity: "Mild" },
     { id: 3, date: "2024-01-05", condition: "Psoriasis", severity: "Severe" },
-    { id: 4, date: "2023-12-28", condition: "Dermatitis", severity: "Moderate" },
+    {
+      id: 4,
+      date: "2023-12-28",
+      condition: "Dermatitis",
+      severity: "Moderate",
+    },
   ];
 
   return (
-    <View style={styles.container}>
-      {/* Header Section */}
-      <View style={styles.headerSection}>
-        <Pressable style={styles.backButton} onPress={() => router.back()}>
-          <Text style={styles.backIcon}>←</Text>
-        </Pressable>
-        <Text style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}>
-          History
-        </Text>
-        <View style={{ width: 50 }} />
-      </View>
-
-      {/* Main Content */}
-      <ScrollView
-        style={styles.scrollContainer}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* History List */}
-        {historyItems.map((item) => (
-          <Pressable
-            key={item.id}
-            style={[styles.historyCard, isSmallScreen && styles.historyCardSmall]}
-            onPress={() => console.log("View history item:", item.id)}
-          >
-            <View style={styles.historyCardContent}>
-              <Text style={[styles.historyDate, isSmallScreen && styles.historyDateSmall]}>
-                {item.date}
-              </Text>
-              <Text style={[styles.historyCondition, isSmallScreen && styles.historyConditionSmall]}>
-                {item.condition}
-              </Text>
-              <Text style={[styles.historySeverity, isSmallScreen && styles.historySeveritySmall]}>
-                Severity: {item.severity}
-              </Text>
-            </View>
-            <Text style={styles.arrowIcon}>→</Text>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: topBarColor }]}>
+      <StatusBar
+        translucent={false}
+        backgroundColor={topBarColor}
+        barStyle={topBarTextStyle}
+      />
+      <View style={styles.container}>
+        {/* Header Section */}
+        <View style={styles.headerSection}>
+          <Pressable style={styles.backButton} onPress={() => router.back()}>
+            <Text style={styles.backIcon}>←</Text>
           </Pressable>
-        ))}
-      </ScrollView>
+          <Text
+            style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
+          >
+            History
+          </Text>
+          <View style={{ width: 50 }} />
+        </View>
 
-      {/* Bottom Tab Navigation */}
-      <BottomTabNavigation isSmallScreen={isSmallScreen} />
-    </View>
+        {/* Main Content */}
+        <ScrollView
+          style={styles.scrollContainer}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* History List */}
+          {historyItems.map((item) => (
+            <Pressable
+              key={item.id}
+              style={[
+                styles.historyCard,
+                isSmallScreen && styles.historyCardSmall,
+              ]}
+              onPress={() => console.log("View history item:", item.id)}
+            >
+              <View style={styles.historyCardContent}>
+                <Text
+                  style={[
+                    styles.historyDate,
+                    isSmallScreen && styles.historyDateSmall,
+                  ]}
+                >
+                  {item.date}
+                </Text>
+                <Text
+                  style={[
+                    styles.historyCondition,
+                    isSmallScreen && styles.historyConditionSmall,
+                  ]}
+                >
+                  {item.condition}
+                </Text>
+                <Text
+                  style={[
+                    styles.historySeverity,
+                    isSmallScreen && styles.historySeveritySmall,
+                  ]}
+                >
+                  Severity: {item.severity}
+                </Text>
+              </View>
+              <Text style={styles.arrowIcon}>→</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+
+        {/* Bottom Tab Navigation */}
+        <BottomTabNavigation isSmallScreen={isSmallScreen} />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
@@ -105,7 +150,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1,
-    marginBottom: 80,
+    marginBottom: 80, // Space for BottomTabNavigation
   },
   scrollContent: {
     paddingHorizontal: 20,

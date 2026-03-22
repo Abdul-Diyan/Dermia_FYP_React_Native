@@ -2,32 +2,37 @@ import BottomTabNavigation from "@/components/bottom-tab-navigation";
 import * as ImagePicker from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
 import {
-    addDoc,
-    collection,
-    deleteDoc,
-    doc,
-    getDocs,
-    orderBy,
-    query,
-    serverTimestamp,
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  orderBy,
+  query,
+  serverTimestamp,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    Image,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    useWindowDimensions,
-    View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Image,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  useWindowDimensions,
+  View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../config/firebaseConfig";
 
 export default function ImageCatalogPage() {
   const { width, height } = useWindowDimensions();
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
   const isSmallScreen = width < 400;
 
   // Catch the mode ("manage", "select", or "upload")
@@ -40,6 +45,10 @@ export default function ImageCatalogPage() {
 
   const itemsPerRow = 3;
   const itemSize = (width - 60) / itemsPerRow - 10;
+
+  // Dynamic status bar colors
+  const topBarColor = isDarkMode ? "#000000" : "#FFFFFF";
+  const topBarTextStyle = isDarkMode ? "light-content" : "dark-content";
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -223,103 +232,114 @@ export default function ImageCatalogPage() {
   );
 
   return (
-    <View style={styles.container}>
-      {/* Header Section */}
-      <View style={styles.headerSection}>
-        <Pressable style={styles.backButton} onPress={() => router.back()}>
-          <Text style={styles.backIcon}>←</Text>
-        </Pressable>
-        <Text
-          style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
-        >
-          {mode === "manage" ? "Image Catalog" : "Select Image"}
-        </Text>
-        <View style={{ width: 50 }} />
-      </View>
-
-      {/* Main Content */}
-      <ScrollView
-        style={styles.scrollContainer}
-        contentContainerStyle={styles.scrollContent}
-      >
-        <View style={styles.gridContainer}>
-          {isLoading ? (
-            <ActivityIndicator
-              size="large"
-              color="#3B9FE5"
-              style={{ marginTop: 50 }}
-            />
-          ) : (
-            <>
-              <FlatList
-                data={images}
-                renderItem={renderImageItem}
-                keyExtractor={(item) => item.id}
-                numColumns={itemsPerRow}
-                scrollEnabled={false}
-                columnWrapperStyle={styles.columnWrapper}
-              />
-              <Pressable
-                style={[
-                  styles.addButton,
-                  { width: itemSize, height: itemSize },
-                ]}
-                onPress={pickAndUploadImage}
-                disabled={isUploading}
-              >
-                {isUploading ? (
-                  <ActivityIndicator color="#FFFFFF" size="large" />
-                ) : (
-                  <Text style={styles.addButtonText}>+</Text>
-                )}
-              </Pressable>
-            </>
-          )}
-        </View>
-      </ScrollView>
-
-      {/* Select Button (Hidden in Manage mode) */}
-      {mode !== "manage" && (
-        <View style={styles.buttonContainer}>
-          <Pressable
-            style={({ pressed }) => [
-              styles.doneButton,
-              isSmallScreen && styles.doneButtonSmall,
-              { opacity: pressed ? 0.8 : 1 },
-            ]}
-            onPress={() => {
-              const selectedObj = images.find(
-                (img) => img.id === selectedImageId,
-              );
-              if (!selectedObj) {
-                Alert.alert("Wait!", "Please select an image first.");
-                return;
-              }
-              router.push({
-                pathname: "/startdiagnosis_page",
-                params: { imageUrl: selectedObj.url },
-              });
-            }}
-          >
-            <Text
-              style={[
-                styles.doneButtonText,
-                isSmallScreen && styles.doneButtonTextSmall,
-              ]}
-            >
-              Select & Analyze
-            </Text>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: topBarColor }]}>
+      <StatusBar
+        translucent={false}
+        backgroundColor={topBarColor}
+        barStyle={topBarTextStyle}
+      />
+      <View style={styles.container}>
+        {/* Header Section */}
+        <View style={styles.headerSection}>
+          <Pressable style={styles.backButton} onPress={() => router.back()}>
+            <Text style={styles.backIcon}>←</Text>
           </Pressable>
+          <Text
+            style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
+          >
+            {mode === "manage" ? "Image Catalog" : "Select Image"}
+          </Text>
+          <View style={{ width: 50 }} />
         </View>
-      )}
 
-      {/* Bottom Tab Navigation */}
-      <BottomTabNavigation isSmallScreen={isSmallScreen} />
-    </View>
+        {/* Main Content */}
+        <ScrollView
+          style={styles.scrollContainer}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.gridContainer}>
+            {isLoading ? (
+              <ActivityIndicator
+                size="large"
+                color="#3B9FE5"
+                style={{ marginTop: 50 }}
+              />
+            ) : (
+              <>
+                <FlatList
+                  data={images}
+                  renderItem={renderImageItem}
+                  keyExtractor={(item) => item.id}
+                  numColumns={itemsPerRow}
+                  scrollEnabled={false}
+                  columnWrapperStyle={styles.columnWrapper}
+                />
+                <Pressable
+                  style={[
+                    styles.addButton,
+                    { width: itemSize, height: itemSize },
+                  ]}
+                  onPress={pickAndUploadImage}
+                  disabled={isUploading}
+                >
+                  {isUploading ? (
+                    <ActivityIndicator color="#FFFFFF" size="large" />
+                  ) : (
+                    <Text style={styles.addButtonText}>+</Text>
+                  )}
+                </Pressable>
+              </>
+            )}
+          </View>
+        </ScrollView>
+
+        {/* Select Button (Hidden in Manage mode) */}
+        {mode !== "manage" && (
+          <View style={styles.buttonContainer}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.doneButton,
+                isSmallScreen && styles.doneButtonSmall,
+                { opacity: pressed ? 0.8 : 1 },
+              ]}
+              onPress={() => {
+                const selectedObj = images.find(
+                  (img) => img.id === selectedImageId,
+                );
+                if (!selectedObj) {
+                  Alert.alert("Wait!", "Please select an image first.");
+                  return;
+                }
+                router.push({
+                  pathname: "/startdiagnosis_page",
+                  params: { imageUrl: selectedObj.url },
+                });
+              }}
+            >
+              <Text
+                style={[
+                  styles.doneButtonText,
+                  isSmallScreen && styles.doneButtonTextSmall,
+                ]}
+              >
+                Select & Analyze
+              </Text>
+            </Pressable>
+          </View>
+        )}
+
+        {/* Bottom Tab Navigation */}
+        <BottomTabNavigation isSmallScreen={isSmallScreen} />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
@@ -368,8 +388,8 @@ const styles = StyleSheet.create({
   },
   columnWrapper: {
     flexWrap: "wrap",
-    justifyContent: "flex-start", // <-- Changed from space-between
-    gap: 15, // <-- Added a slight gap so they don't touch
+    justifyContent: "flex-start",
+    gap: 15,
     marginBottom: 16,
   },
   imageItem: {

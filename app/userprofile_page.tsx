@@ -6,20 +6,30 @@ import {
   Alert,
   Pressable,
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   TextInput,
+  useColorScheme,
   useWindowDimensions,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../config/firebaseConfig";
 
 export default function UserProfilePage() {
   const { width } = useWindowDimensions();
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
   const isSmallScreen = width < 400;
+
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState("Rohaan Khuram");
   const [email, setEmail] = useState("rohaankhuram@gmail.com");
+
+  // Dynamic status bar colors
+  const topBarColor = isDarkMode ? "#000000" : "#FFFFFF";
+  const topBarTextStyle = isDarkMode ? "light-content" : "dark-content";
 
   // Fetch the user's real email when the page loads
   useEffect(() => {
@@ -41,133 +51,145 @@ export default function UserProfilePage() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Header Section */}
-      <View style={styles.headerSection}>
-        <Pressable style={styles.backButton} onPress={() => router.back()}>
-          <Text style={styles.backIcon}>←</Text>
-        </Pressable>
-        <Text
-          style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
-        >
-          Profile
-        </Text>
-        <Pressable
-          style={styles.editButton}
-          onPress={() => setIsEditing(!isEditing)}
-        >
-          <Text style={styles.editIcon}>{isEditing ? "✓" : "✏"}</Text>
-        </Pressable>
-      </View>
-
-      <ScrollView
-        style={styles.scrollContainer}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* Profile Avatar */}
-        <View
-          style={[
-            styles.avatarContainer,
-            isSmallScreen && styles.avatarContainerSmall,
-          ]}
-        >
-          <View style={[styles.avatar, isSmallScreen && styles.avatarSmall]}>
-            <Text
-              style={[
-                styles.avatarText,
-                isSmallScreen && styles.avatarTextSmall,
-              ]}
-            >
-              {name
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase()}
-            </Text>
-          </View>
-        </View>
-
-        {/* Profile Info */}
-        <View
-          style={[
-            styles.infoContainer,
-            isSmallScreen && styles.infoContainerSmall,
-          ]}
-        >
-          {/* Name */}
-          <View style={styles.inputGroup}>
-            <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
-              Full Name
-            </Text>
-            {isEditing ? (
-              <TextInput
-                style={[styles.input, isSmallScreen && styles.inputSmall]}
-                value={name}
-                onChangeText={setName}
-              />
-            ) : (
-              <Text
-                style={[
-                  styles.displayText,
-                  isSmallScreen && styles.displayTextSmall,
-                ]}
-              >
-                {name}
-              </Text>
-            )}
-          </View>
-
-          {/* Email */}
-          <View style={styles.inputGroup}>
-            <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
-              Email
-            </Text>
-            {isEditing ? (
-              <TextInput
-                style={[styles.input, isSmallScreen && styles.inputSmall]}
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-              />
-            ) : (
-              <Text
-                style={[
-                  styles.displayText,
-                  isSmallScreen && styles.displayTextSmall,
-                ]}
-              >
-                {email}
-              </Text>
-            )}
-          </View>
-        </View>
-
-        {/* Logout Button */}
-        <Pressable
-          style={({ pressed }) => [
-            styles.logoutButton,
-            isSmallScreen && styles.logoutButtonSmall,
-            { opacity: pressed ? 0.8 : 1 },
-          ]}
-          onPress={handleLogout}
-        >
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: topBarColor }]}>
+      <StatusBar
+        translucent={false}
+        backgroundColor={topBarColor}
+        barStyle={topBarTextStyle}
+      />
+      <View style={styles.container}>
+        {/* Header Section */}
+        <View style={styles.headerSection}>
+          <Pressable style={styles.backButton} onPress={() => router.back()}>
+            <Text style={styles.backIcon}>←</Text>
+          </Pressable>
           <Text
+            style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
+          >
+            Profile
+          </Text>
+          <Pressable
+            style={styles.editButton}
+            onPress={() => setIsEditing(!isEditing)}
+          >
+            <Text style={styles.editIcon}>{isEditing ? "✓" : "✏"}</Text>
+          </Pressable>
+        </View>
+
+        <ScrollView
+          style={styles.scrollContainer}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Profile Avatar */}
+          <View
             style={[
-              styles.logoutButtonText,
-              isSmallScreen && styles.logoutButtonTextSmall,
+              styles.avatarContainer,
+              isSmallScreen && styles.avatarContainerSmall,
             ]}
           >
-            Logout
-          </Text>
-        </Pressable>
-      </ScrollView>
+            <View style={[styles.avatar, isSmallScreen && styles.avatarSmall]}>
+              <Text
+                style={[
+                  styles.avatarText,
+                  isSmallScreen && styles.avatarTextSmall,
+                ]}
+              >
+                {name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()}
+              </Text>
+            </View>
+          </View>
 
-      <BottomTabNavigation isSmallScreen={isSmallScreen} />
-    </View>
+          {/* Profile Info */}
+          <View
+            style={[
+              styles.infoContainer,
+              isSmallScreen && styles.infoContainerSmall,
+            ]}
+          >
+            {/* Name */}
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
+                Full Name
+              </Text>
+              {isEditing ? (
+                <TextInput
+                  style={[styles.input, isSmallScreen && styles.inputSmall]}
+                  value={name}
+                  onChangeText={setName}
+                />
+              ) : (
+                <Text
+                  style={[
+                    styles.displayText,
+                    isSmallScreen && styles.displayTextSmall,
+                  ]}
+                >
+                  {name}
+                </Text>
+              )}
+            </View>
+
+            {/* Email */}
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
+                Email
+              </Text>
+              {isEditing ? (
+                <TextInput
+                  style={[styles.input, isSmallScreen && styles.inputSmall]}
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              ) : (
+                <Text
+                  style={[
+                    styles.displayText,
+                    isSmallScreen && styles.displayTextSmall,
+                  ]}
+                >
+                  {email}
+                </Text>
+              )}
+            </View>
+          </View>
+
+          {/* Logout Button */}
+          <Pressable
+            style={({ pressed }) => [
+              styles.logoutButton,
+              isSmallScreen && styles.logoutButtonSmall,
+              { opacity: pressed ? 0.8 : 1 },
+            ]}
+            onPress={handleLogout}
+          >
+            <Text
+              style={[
+                styles.logoutButtonText,
+                isSmallScreen && styles.logoutButtonTextSmall,
+              ]}
+            >
+              Logout
+            </Text>
+          </Pressable>
+        </ScrollView>
+
+        <BottomTabNavigation isSmallScreen={isSmallScreen} />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
@@ -215,7 +237,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1,
-    marginBottom: 80,
+    marginBottom: 80, // Accounts for BottomTabNavigation
   },
   scrollContent: {
     paddingHorizontal: 20,

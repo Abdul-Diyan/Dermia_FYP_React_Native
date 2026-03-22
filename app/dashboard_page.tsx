@@ -3,25 +3,34 @@ import { router, useFocusEffect } from "expo-router";
 import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 import React, { useCallback, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    useWindowDimensions,
-    View,
+  ActivityIndicator,
+  Alert,
+  Image,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  useWindowDimensions,
+  View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../config/firebaseConfig";
 
 export default function DashboardPage() {
   const { width, height } = useWindowDimensions();
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
   const isSmallScreen = width < 400;
 
   const [recentImages, setRecentImages] = useState<any[]>([]);
   const [recentReports, setRecentReports] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Dynamic status bar colors
+  const topBarColor = isDarkMode ? "#000000" : "#FFFFFF";
+  const topBarTextStyle = isDarkMode ? "light-content" : "dark-content";
 
   // useFocusEffect runs every time this screen becomes the active screen
   useFocusEffect(
@@ -72,203 +81,217 @@ export default function DashboardPage() {
   );
 
   return (
-    <View style={styles.container}>
-      {/* Header Section */}
-      <View style={styles.headerSection}>
-        <Text
-          style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
-        >
-          Welcome Back !
-        </Text>
-      </View>
-
-      {/* Main Content */}
-      <ScrollView
-        style={styles.scrollContainer}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* Browse Images Section */}
-        <View
-          style={[
-            styles.cardContainer,
-            isSmallScreen && styles.cardContainerSmall,
-          ]}
-        >
-          {isLoading ? (
-            <ActivityIndicator color="#3B9FE5" />
-          ) : (
-            <View style={styles.imageGridRow}>
-              {recentImages.length > 0 ? (
-                recentImages.map((img) => (
-                  <Image
-                    key={img.id}
-                    source={{ uri: img.url }}
-                    style={[
-                      styles.liveThumbnail,
-                      isSmallScreen && styles.liveThumbnailSmall,
-                    ]}
-                  />
-                ))
-              ) : (
-                // The Visual Empty State for Images
-                <Pressable
-                  style={[
-                    styles.emptyPlaceholderCard,
-                    isSmallScreen && styles.emptyPlaceholderCardSmall,
-                  ]}
-                  onPress={() =>
-                    router.push({
-                      pathname: "/imagecatalog_page",
-                      params: { mode: "upload" },
-                    })
-                  }
-                >
-                  <Text style={styles.emptyIcon}>📷</Text>
-                  <Text style={styles.emptyPromptText}>Add Photo</Text>
-                </Pressable>
-              )}
-            </View>
-          )}
-
-          <Pressable
-            onPress={() =>
-              router.push({
-                pathname: "/imagecatalog_page",
-                params: { mode: "manage" },
-              })
-            }
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: topBarColor }]}>
+      <StatusBar
+        translucent={false}
+        backgroundColor={topBarColor}
+        barStyle={topBarTextStyle}
+      />
+      <View style={styles.container}>
+        {/* Header Section */}
+        <View style={styles.headerSection}>
+          <Text
+            style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
           >
-            <Text
-              style={[
-                styles.viewAllLink,
-                isSmallScreen && styles.viewAllLinkSmall,
-              ]}
-            >
-              View all
-            </Text>
-          </Pressable>
+            Welcome Back !
+          </Text>
         </View>
 
-        {/* Previous Report History Section */}
-        <View
-          style={[
-            styles.cardContainer,
-            isSmallScreen && styles.cardContainerSmall,
-          ]}
+        {/* Main Content */}
+        <ScrollView
+          style={styles.scrollContainer}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
         >
-          {isLoading ? (
-            <ActivityIndicator color="#3B9FE5" />
-          ) : (
-            <View style={styles.reportsWrapper}>
-              {recentReports.length > 0 ? (
-                recentReports.map((report) => (
+          {/* Browse Images Section */}
+          <View
+            style={[
+              styles.cardContainer,
+              isSmallScreen && styles.cardContainerSmall,
+            ]}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#3B9FE5" />
+            ) : (
+              <View style={styles.imageGridRow}>
+                {recentImages.length > 0 ? (
+                  recentImages.map((img) => (
+                    <Image
+                      key={img.id}
+                      source={{ uri: img.url }}
+                      style={[
+                        styles.liveThumbnail,
+                        isSmallScreen && styles.liveThumbnailSmall,
+                      ]}
+                    />
+                  ))
+                ) : (
+                  // The Visual Empty State for Images
                   <Pressable
-                    key={report.id}
                     style={[
-                      styles.reportCard,
-                      isSmallScreen && styles.reportCardSmall,
+                      styles.emptyPlaceholderCard,
+                      isSmallScreen && styles.emptyPlaceholderCardSmall,
                     ]}
                     onPress={() =>
                       router.push({
-                        pathname: "/startdiagnosis_page",
-                        params: { imageUrl: report.imageUrl },
+                        pathname: "/imagecatalog_page",
+                        params: { mode: "upload" },
                       })
                     }
                   >
-                    <Text
-                      style={[
-                        styles.reportText,
-                        isSmallScreen && styles.reportTextSmall,
-                      ]}
-                      numberOfLines={1}
-                    >
-                      {report.predictedLesionType || "Report"}
-                    </Text>
-                    <Text style={styles.reportConfidenceText}>
-                      {report.modelConfidence
-                        ? `Conf: ${report.modelConfidence}`
-                        : "View Details"}
-                    </Text>
+                    <Text style={styles.emptyIcon}>📷</Text>
+                    <Text style={styles.emptyPromptText}>Add Photo</Text>
                   </Pressable>
-                ))
-              ) : (
-                // The Visual Empty State for Reports
-                <Pressable
-                  style={[
-                    styles.emptyPlaceholderCard,
-                    styles.emptyReportCard,
-                    isSmallScreen && styles.reportCardSmall,
-                  ]}
-                >
-                  <Text style={styles.emptyIcon}>🔬</Text>
-                  <Text style={styles.emptyPromptText}>No Scans Yet</Text>
-                </Pressable>
-              )}
-            </View>
-          )}
+                )}
+              </View>
+            )}
 
-          <Pressable onPress={() => router.push("/reportcatalog_page")}>
-            <Text
-              style={[
-                styles.viewAllLink,
-                isSmallScreen && styles.viewAllLinkSmall,
-              ]}
+            <Pressable
+              onPress={() =>
+                router.push({
+                  pathname: "/imagecatalog_page",
+                  params: { mode: "manage" },
+                })
+              }
             >
-              View all
-            </Text>
-          </Pressable>
-        </View>
-        {/* Start Diagnosis Button */}
-        <Pressable
-          style={({ pressed }) => [
-            styles.diagnosisButton,
-            isSmallScreen && styles.diagnosisButtonSmall,
-            { opacity: pressed ? 0.8 : 1 },
-          ]}
-          onPress={() => {
-            Alert.alert(
-              "Start Diagnosis",
-              "How would you like to provide the image?",
-              [
-                { text: "Cancel", style: "cancel" },
-                {
-                  text: "Previous Scan",
-                  onPress: () =>
-                    router.push({
-                      pathname: "/imagecatalog_page",
-                      params: { mode: "select" },
-                    }),
-                },
-                {
-                  text: "Upload New Photo",
-                  onPress: () =>
-                    router.push({
-                      pathname: "/imagecatalog_page",
-                      params: { mode: "upload" },
-                    }),
-                },
-              ],
-            );
-          }}
-        >
-          <Text
+              <Text
+                style={[
+                  styles.viewAllLink,
+                  isSmallScreen && styles.viewAllLinkSmall,
+                ]}
+              >
+                View all
+              </Text>
+            </Pressable>
+          </View>
+
+          {/* Previous Report History Section */}
+          <View
             style={[
-              styles.diagnosisButtonText,
-              isSmallScreen && styles.diagnosisButtonTextSmall,
+              styles.cardContainer,
+              isSmallScreen && styles.cardContainerSmall,
             ]}
           >
-            Start Diagnosis
-          </Text>
-        </Pressable>
-      </ScrollView>
+            {isLoading ? (
+              <ActivityIndicator color="#3B9FE5" />
+            ) : (
+              <View style={styles.reportsWrapper}>
+                {recentReports.length > 0 ? (
+                  recentReports.map((report) => (
+                    <Pressable
+                      key={report.id}
+                      style={[
+                        styles.reportCard,
+                        isSmallScreen && styles.reportCardSmall,
+                      ]}
+                      onPress={() =>
+                        router.push({
+                          pathname: "/startdiagnosis_page",
+                          params: { imageUrl: report.imageUrl },
+                        })
+                      }
+                    >
+                      <Text
+                        style={[
+                          styles.reportText,
+                          isSmallScreen && styles.reportTextSmall,
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {report.predictedLesionType || "Report"}
+                      </Text>
+                      <Text style={styles.reportConfidenceText}>
+                        {report.modelConfidence
+                          ? `Conf: ${report.modelConfidence}`
+                          : "View Details"}
+                      </Text>
+                    </Pressable>
+                  ))
+                ) : (
+                  // The Visual Empty State for Reports
+                  <Pressable
+                    style={[
+                      styles.emptyPlaceholderCard,
+                      styles.emptyReportCard,
+                      isSmallScreen && styles.reportCardSmall,
+                    ]}
+                  >
+                    <Text style={styles.emptyIcon}>🔬</Text>
+                    <Text style={styles.emptyPromptText}>No Scans Yet</Text>
+                  </Pressable>
+                )}
+              </View>
+            )}
 
-      {/* Bottom Tab Navigation */}
-      <BottomTabNavigation isSmallScreen={isSmallScreen} />
-    </View>
+            <Pressable onPress={() => router.push("/reportcatalog_page")}>
+              <Text
+                style={[
+                  styles.viewAllLink,
+                  isSmallScreen && styles.viewAllLinkSmall,
+                ]}
+              >
+                View all
+              </Text>
+            </Pressable>
+          </View>
+
+          {/* Start Diagnosis Button */}
+          <View style={styles.section}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.diagnosisButton,
+                isSmallScreen && styles.diagnosisButtonSmall,
+                { opacity: pressed ? 0.8 : 1 },
+              ]}
+              onPress={() => {
+                Alert.alert(
+                  "Start Diagnosis",
+                  "How would you like to provide the image?",
+                  [
+                    { text: "Cancel", style: "cancel" },
+                    {
+                      text: "Previous Scan",
+                      onPress: () =>
+                        router.push({
+                          pathname: "/imagecatalog_page",
+                          params: { mode: "select" },
+                        }),
+                    },
+                    {
+                      text: "Upload New Photo",
+                      onPress: () =>
+                        router.push({
+                          pathname: "/imagecatalog_page",
+                          params: { mode: "upload" },
+                        }),
+                    },
+                  ],
+                );
+              }}
+            >
+              <Text
+                style={[
+                  styles.diagnosisButtonText,
+                  isSmallScreen && styles.diagnosisButtonTextSmall,
+                ]}
+              >
+                Start Diagnosis
+              </Text>
+            </Pressable>
+          </View>
+        </ScrollView>
+
+        {/* Bottom Tab Navigation */}
+        <BottomTabNavigation isSmallScreen={isSmallScreen} />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: "#F8F8F8",
@@ -294,10 +317,11 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingVertical: 24,
-    paddingBottom: 100,
+    paddingBottom: 100, // Important: leaves room for the absolute BottomTabNavigation
   },
   section: {
-    marginBottom: 32,
+    marginTop: 32,
+    alignItems: "center",
   },
   sectionSmall: {
     marginBottom: 24,
@@ -319,6 +343,7 @@ const styles = StyleSheet.create({
     borderColor: "#3B9FE5",
     padding: 20,
     alignItems: "center",
+    marginBottom: 24, // Adds space between the cards
   },
   cardContainerSmall: {
     padding: 16,
@@ -386,17 +411,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 60,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 32,
     elevation: 3,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    width: "100%", // Helps it stretch naturally
   },
   diagnosisButtonSmall: {
     paddingVertical: 15,
     paddingHorizontal: 40,
-    marginBottom: 24,
   },
   diagnosisButtonText: {
     fontSize: 18,

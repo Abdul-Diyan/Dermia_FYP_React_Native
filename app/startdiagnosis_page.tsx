@@ -1,29 +1,34 @@
 import BottomTabNavigation from "@/components/bottom-tab-navigation";
 import { router, useLocalSearchParams } from "expo-router";
 import {
-    addDoc,
-    collection,
-    getDocs,
-    limit,
-    query,
-    serverTimestamp,
-    where,
+  addDoc,
+  collection,
+  getDocs,
+  limit,
+  query,
+  serverTimestamp,
+  where,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Image,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    useWindowDimensions,
-    View,
+  ActivityIndicator,
+  Image,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  useWindowDimensions,
+  View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../config/firebaseConfig";
 
 export default function StartDiagnosisPage() {
   const { width, height } = useWindowDimensions();
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
   const isSmallScreen = width < 400;
 
   const { imageUrl } = useLocalSearchParams();
@@ -31,6 +36,10 @@ export default function StartDiagnosisPage() {
 
   // 1. Make reportData a state variable so we can update it after "Analysis"
   const [reportData, setReportData] = useState<any>(null);
+
+  // Dynamic status bar colors
+  const topBarColor = isDarkMode ? "#000000" : "#FFFFFF";
+  const topBarTextStyle = isDarkMode ? "light-content" : "dark-content";
 
   useEffect(() => {
     const analyzeAndSaveReport = async () => {
@@ -105,181 +114,195 @@ export default function StartDiagnosisPage() {
   }, [imageUrl]);
 
   return (
-    <View style={styles.container}>
-      {/* Header Section */}
-      <View style={styles.headerSection}>
-        <Pressable style={styles.backButton} onPress={() => router.back()}>
-          <Text style={styles.backIcon}>←</Text>
-        </Pressable>
-        <Text
-          style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
-        >
-          Diagnosis Report
-        </Text>
-        <View style={{ width: 50 }} />
-      </View>
-
-      {/* Main Content */}
-      {isAnalyzing || !reportData ? (
-        // SHOW THIS WHILE "ANALYZING" OR WAITING FOR DATA
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#3B9FE5" />
-          <Text style={styles.loadingText}>
-            Analyzing lesion with AI Model...
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: topBarColor }]}>
+      <StatusBar
+        translucent={false}
+        backgroundColor={topBarColor}
+        barStyle={topBarTextStyle}
+      />
+      <View style={styles.container}>
+        {/* Header Section */}
+        <View style={styles.headerSection}>
+          <Pressable style={styles.backButton} onPress={() => router.back()}>
+            <Text style={styles.backIcon}>←</Text>
+          </Pressable>
+          <Text
+            style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
+          >
+            Diagnosis Report
           </Text>
-          <Text style={styles.loadingSubtext}>
-            This may take a few moments.
-          </Text>
+          <View style={{ width: 50 }} />
         </View>
-      ) : (
-        // SHOW THIS WHEN DONE AND DATA EXISTS
-        <ScrollView
-          style={styles.scrollContainer}
-          contentContainerStyle={styles.scrollContent}
-        >
-          {/* Report ID */}
-          <View style={styles.reportIdSection}>
-            <Text
-              style={[
-                styles.reportIdLabel,
-                isSmallScreen && styles.reportIdLabelSmall,
-              ]}
-            >
-              Report ID:{" "}
-              <Text
-                style={[
-                  styles.reportIdValue,
-                  isSmallScreen && styles.reportIdValueSmall,
-                ]}
-              >
-                {reportData.reportId}
-              </Text>
+
+        {/* Main Content */}
+        {isAnalyzing || !reportData ? (
+          // SHOW THIS WHILE "ANALYZING" OR WAITING FOR DATA
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#3B9FE5" />
+            <Text style={styles.loadingText}>
+              Analyzing lesion with AI Model...
+            </Text>
+            <Text style={styles.loadingSubtext}>
+              This may take a few moments.
             </Text>
           </View>
-
-          {/* Main Report Card */}
-          <View
-            style={[styles.reportCard, isSmallScreen && styles.reportCardSmall]}
+        ) : (
+          // SHOW THIS WHEN DONE AND DATA EXISTS
+          <ScrollView
+            style={styles.scrollContainer}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
           >
-            {/* Basic Info */}
-            {/* Show the actual uploaded image */}
-            {imageUrl && (
-              <View style={styles.uploadedImageContainer}>
-                <Text style={styles.imageLabel}>Analyzed Image:</Text>
-                <Image
-                  source={{ uri: imageUrl as string }}
-                  style={styles.uploadedImage}
-                  resizeMode="cover"
-                />
-              </View>
-            )}
-
-            {/* Diagnosis Summary */}
-            <View style={styles.summarySection}>
+            {/* Report ID */}
+            <View style={styles.reportIdSection}>
               <Text
                 style={[
-                  styles.summaryTitle,
-                  isSmallScreen && styles.summaryTitleSmall,
+                  styles.reportIdLabel,
+                  isSmallScreen && styles.reportIdLabelSmall,
                 ]}
               >
-                Diagnosis Summary
-              </Text>
-
-              <Text
-                style={[
-                  styles.summaryContent,
-                  styles.marginTop,
-                  isSmallScreen && styles.summaryContentSmall,
-                ]}
-              >
-                Predicted lesion type:{" "}
-                <Text style={styles.summaryValue}>
-                  {reportData.predictedLesionType}
-                </Text>
-              </Text>
-
-              <Text
-                style={[
-                  styles.summaryContent,
-                  styles.marginTop,
-                  isSmallScreen && styles.summaryContentSmall,
-                ]}
-              >
-                Model Confidence:{" "}
-                <Text style={styles.summaryValue}>
-                  {reportData.modelConfidence}
-                </Text>
-              </Text>
-
-              {/* Heatmap Visualization */}
-              <View style={styles.heatmapSection}>
+                Report ID:{" "}
                 <Text
                   style={[
-                    styles.heatmapTitle,
-                    isSmallScreen && styles.heatmapTitleSmall,
+                    styles.reportIdValue,
+                    isSmallScreen && styles.reportIdValueSmall,
                   ]}
                 >
-                  Heatmap Visualization:
+                  {reportData.reportId}
                 </Text>
+              </Text>
+            </View>
+
+            {/* Main Report Card */}
+            <View
+              style={[
+                styles.reportCard,
+                isSmallScreen && styles.reportCardSmall,
+              ]}
+            >
+              {/* Basic Info */}
+              {/* Show the actual uploaded image */}
+              {imageUrl && (
+                <View style={styles.uploadedImageContainer}>
+                  <Text style={styles.imageLabel}>Analyzed Image:</Text>
+                  <Image
+                    source={{ uri: imageUrl as string }}
+                    style={styles.uploadedImage}
+                    resizeMode="cover"
+                  />
+                </View>
+              )}
+
+              {/* Diagnosis Summary */}
+              <View style={styles.summarySection}>
                 <Text
                   style={[
-                    styles.heatmapDescription,
+                    styles.summaryTitle,
+                    isSmallScreen && styles.summaryTitleSmall,
+                  ]}
+                >
+                  Diagnosis Summary
+                </Text>
+
+                <Text
+                  style={[
+                    styles.summaryContent,
                     styles.marginTop,
-                    isSmallScreen && styles.heatmapDescriptionSmall,
+                    isSmallScreen && styles.summaryContentSmall,
                   ]}
                 >
-                  Shows the regions of significance
+                  Predicted lesion type:{" "}
+                  <Text style={styles.summaryValue}>
+                    {reportData.predictedLesionType}
+                  </Text>
                 </Text>
 
-                {/* Heatmap Placeholder */}
+                <Text
+                  style={[
+                    styles.summaryContent,
+                    styles.marginTop,
+                    isSmallScreen && styles.summaryContentSmall,
+                  ]}
+                >
+                  Model Confidence:{" "}
+                  <Text style={styles.summaryValue}>
+                    {reportData.modelConfidence}
+                  </Text>
+                </Text>
+
+                {/* Heatmap Visualization */}
+                <View style={styles.heatmapSection}>
+                  <Text
+                    style={[
+                      styles.heatmapTitle,
+                      isSmallScreen && styles.heatmapTitleSmall,
+                    ]}
+                  >
+                    Heatmap Visualization:
+                  </Text>
+                  <Text
+                    style={[
+                      styles.heatmapDescription,
+                      styles.marginTop,
+                      isSmallScreen && styles.heatmapDescriptionSmall,
+                    ]}
+                  >
+                    Shows the regions of significance
+                  </Text>
+
+                  {/* Heatmap Placeholder */}
+                  <View
+                    style={[
+                      styles.heatmapPlaceholder,
+                      isSmallScreen && styles.heatmapPlaceholderSmall,
+                    ]}
+                  >
+                    <View style={styles.heatmapGradient} />
+                  </View>
+                </View>
+              </View>
+
+              {/* Explanation Section */}
+              <View style={styles.explanationSection}>
+                <Text
+                  style={[
+                    styles.explanationTitle,
+                    isSmallScreen && styles.explanationTitleSmall,
+                  ]}
+                >
+                  Explanation
+                </Text>
+
                 <View
                   style={[
-                    styles.heatmapPlaceholder,
-                    isSmallScreen && styles.heatmapPlaceholderSmall,
+                    styles.explanationBox,
+                    isSmallScreen && styles.explanationBoxSmall,
                   ]}
                 >
-                  <View style={styles.heatmapGradient} />
+                  <Text
+                    style={[
+                      styles.explanationText,
+                      isSmallScreen && styles.explanationTextSmall,
+                    ]}
+                  >
+                    {reportData.explanation}
+                  </Text>
                 </View>
               </View>
             </View>
-
-            {/* Explanation Section */}
-            <View style={styles.explanationSection}>
-              <Text
-                style={[
-                  styles.explanationTitle,
-                  isSmallScreen && styles.explanationTitleSmall,
-                ]}
-              >
-                Explanation
-              </Text>
-
-              <View
-                style={[
-                  styles.explanationBox,
-                  isSmallScreen && styles.explanationBoxSmall,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.explanationText,
-                    isSmallScreen && styles.explanationTextSmall,
-                  ]}
-                >
-                  {reportData.explanation}
-                </Text>
-              </View>
-            </View>
-          </View>
-        </ScrollView>
-      )}
-      {/* Bottom Tab Navigation */}
-      <BottomTabNavigation isSmallScreen={isSmallScreen} />
-    </View>
+          </ScrollView>
+        )}
+        {/* Bottom Tab Navigation */}
+        <BottomTabNavigation isSmallScreen={isSmallScreen} />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
@@ -316,7 +339,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1,
-    marginBottom: 80,
+    marginBottom: 80, // Leaves room for the bottom tab navigation
   },
   scrollContent: {
     paddingHorizontal: 20,

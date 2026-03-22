@@ -2,24 +2,34 @@ import { router } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import {
-    Alert,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    useWindowDimensions,
-    View,
+  Alert,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  useColorScheme,
+  useWindowDimensions,
+  View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../config/firebaseConfig";
 
 export default function SignupPage() {
   const { width, height } = useWindowDimensions();
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
+
   const isSmallScreen = width < 400;
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  // Dynamic status bar colors
+  const topBarColor = isDarkMode ? "#000000" : "#FFFFFF";
+  const topBarTextStyle = isDarkMode ? "light-content" : "dark-content";
 
   const handleSignup = async () => {
     if (!email || !password || !username) {
@@ -47,142 +57,163 @@ export default function SignupPage() {
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-    >
-      {/* Header Section with Blue Background */}
-      <View style={[styles.headerSection, { minHeight: height * 0.25 }]}>
-        <Text
-          style={[styles.titleText, isSmallScreen && styles.titleTextSmall]}
-        >
-          Sign up
-        </Text>
-      </View>
-
-      {/* Form Container */}
-      <View
-        style={[
-          styles.formContainer,
-          isSmallScreen && styles.formContainerSmall,
-        ]}
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: topBarColor }]}>
+      <StatusBar
+        translucent={false}
+        backgroundColor={topBarColor}
+        barStyle={topBarTextStyle}
+      />
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        bounces={false}
+        showsHorizontalScrollIndicator={false}
       >
-        {/* Subtitle */}
-        <Text
-          style={[
-            styles.subtitleText,
-            isSmallScreen && styles.subtitleTextSmall,
-          ]}
-        >
-          Create a new Account
-        </Text>
-
-        {/* Email Input */}
-        <View style={styles.inputGroup}>
-          <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
-            Email
-          </Text>
-          <TextInput
-            style={[styles.input, isSmallScreen && styles.inputSmall]}
-            placeholder="rohaan@gmail.com"
-            placeholderTextColor="#999"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
-          />
-        </View>
-
-        {/* Username Input */}
-        <View style={styles.inputGroup}>
-          <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
-            Username
-          </Text>
-          <TextInput
-            style={[styles.input, isSmallScreen && styles.inputSmall]}
-            placeholder="rohaan.awan99"
-            placeholderTextColor="#999"
-            value={username}
-            onChangeText={setUsername}
-          />
-        </View>
-
-        {/* Password Input */}
-        <View style={styles.inputGroup}>
-          <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
-            Password
-          </Text>
-          <TextInput
-            style={[styles.input, isSmallScreen && styles.inputSmall]}
-            placeholder="••••••••••••••••"
-            placeholderTextColor="#999"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-        </View>
-
-        {/* Confirm Password Input */}
-        <View style={styles.inputGroup}>
-          <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
-            Confirm Password
-          </Text>
-          <TextInput
-            style={[styles.input, isSmallScreen && styles.inputSmall]}
-            placeholder="••••••••••••••••"
-            placeholderTextColor="#999"
-            secureTextEntry
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-          />
-        </View>
-
-        {/* Sign Up Button */}
-        <Pressable
-          style={({ pressed }) => [
-            styles.signupButton,
-            isSmallScreen && styles.signupButtonSmall,
-            { opacity: pressed ? 0.8 : 1 },
-          ]}
-          onPress={handleSignup}
-        >
+        {/* Header Section with Blue Background */}
+        <View style={[styles.headerSection, { minHeight: height * 0.25 }]}>
           <Text
-            style={[
-              styles.signupButtonText,
-              isSmallScreen && styles.signupButtonTextSmall,
-            ]}
+            style={[styles.titleText, isSmallScreen && styles.titleTextSmall]}
           >
             Sign up
           </Text>
-        </Pressable>
-
-        {/* Already Have Account Link */}
-        <View style={styles.loginContainer}>
-          <Text
-            style={[styles.loginText, isSmallScreen && styles.loginTextSmall]}
-          >
-            Already have an account?{" "}
-          </Text>
-          <Pressable onPress={() => router.push("/login_page")}>
-            <Text
-              style={[styles.loginLink, isSmallScreen && styles.loginLinkSmall]}
-            >
-              Login
-            </Text>
-          </Pressable>
         </View>
-      </View>
-    </ScrollView>
+
+        {/* Form Container */}
+        <View
+          style={[
+            styles.formContainer,
+            isSmallScreen && styles.formContainerSmall,
+            { width: isSmallScreen ? width * 0.9 : width * 0.85 }, // Ensures form stays centered and responsive
+          ]}
+        >
+          {/* Subtitle */}
+          <Text
+            style={[
+              styles.subtitleText,
+              isSmallScreen && styles.subtitleTextSmall,
+            ]}
+          >
+            Create a new Account
+          </Text>
+
+          {/* Email Input */}
+          <View style={styles.inputGroup}>
+            <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
+              Email
+            </Text>
+            <TextInput
+              style={[styles.input, isSmallScreen && styles.inputSmall]}
+              placeholder="rohaan@gmail.com"
+              placeholderTextColor="#999"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
+            />
+          </View>
+
+          {/* Username Input */}
+          <View style={styles.inputGroup}>
+            <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
+              Username
+            </Text>
+            <TextInput
+              style={[styles.input, isSmallScreen && styles.inputSmall]}
+              placeholder="rohaan.awan99"
+              placeholderTextColor="#999"
+              autoCapitalize="none"
+              value={username}
+              onChangeText={setUsername}
+            />
+          </View>
+
+          {/* Password Input */}
+          <View style={styles.inputGroup}>
+            <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
+              Password
+            </Text>
+            <TextInput
+              style={[styles.input, isSmallScreen && styles.inputSmall]}
+              placeholder="••••••••••••••••"
+              placeholderTextColor="#999"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+            />
+          </View>
+
+          {/* Confirm Password Input */}
+          <View style={styles.inputGroup}>
+            <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
+              Confirm Password
+            </Text>
+            <TextInput
+              style={[styles.input, isSmallScreen && styles.inputSmall]}
+              placeholder="••••••••••••••••"
+              placeholderTextColor="#999"
+              secureTextEntry
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+            />
+          </View>
+
+          {/* Sign Up Button */}
+          <View style={{ marginTop: 12 }}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.signupButton,
+                isSmallScreen && styles.signupButtonSmall,
+                { opacity: pressed ? 0.8 : 1 },
+              ]}
+              onPress={handleSignup}
+            >
+              <Text
+                style={[
+                  styles.signupButtonText,
+                  isSmallScreen && styles.signupButtonTextSmall,
+                ]}
+              >
+                Sign up
+              </Text>
+            </Pressable>
+          </View>
+
+          {/* Already Have Account Link */}
+          <View style={styles.loginContainer}>
+            <Text
+              style={[styles.loginText, isSmallScreen && styles.loginTextSmall]}
+            >
+              Already have an account?{" "}
+            </Text>
+            <Pressable onPress={() => router.push("/login_page")}>
+              <Text
+                style={[
+                  styles.loginLink,
+                  isSmallScreen && styles.loginLinkSmall,
+                ]}
+              >
+                Login
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
   contentContainer: {
     flexGrow: 1,
-    paddingBottom: 30,
+    alignItems: "center", // Keeps the header and form horizontally centered
+    paddingBottom: 40,
   },
   headerSection: {
     backgroundColor: "#3B9FE5",
@@ -190,8 +221,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderBottomLeftRadius: 32,
     borderBottomRightRadius: 32,
-    paddingTop: 40,
-    paddingBottom: 20,
+    paddingBottom: 40, // Match login page padding so the form overlaps nicely
+    width: "100%",
+    overflow: "hidden",
   },
   titleText: {
     fontSize: 64,
@@ -205,18 +237,16 @@ const styles = StyleSheet.create({
   formContainer: {
     backgroundColor: "#FFFFFF",
     borderRadius: 24,
-    marginHorizontal: 20,
-    marginTop: -30,
+    marginTop: -40, // Match login page overlap
     paddingHorizontal: 24,
     paddingVertical: 32,
-    elevation: 5,
+    elevation: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
   },
   formContainerSmall: {
-    marginHorizontal: 16,
     paddingHorizontal: 16,
     paddingVertical: 24,
   },

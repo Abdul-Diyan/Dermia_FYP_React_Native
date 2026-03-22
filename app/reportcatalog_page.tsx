@@ -1,31 +1,36 @@
 import BottomTabNavigation from "@/components/bottom-tab-navigation";
 import { router } from "expo-router";
 import {
-    collection,
-    doc,
-    getDocs,
-    limit,
-    orderBy,
-    query,
-    writeBatch,
+  collection,
+  doc,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  writeBatch,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    Image,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    useWindowDimensions,
-    View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Image,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  useWindowDimensions,
+  View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../config/firebaseConfig";
 
 export default function ReportCatalogPage() {
   const { width, height } = useWindowDimensions();
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
   const isSmallScreen = width < 400;
 
   const [reports, setReports] = useState<any[]>([]);
@@ -33,6 +38,10 @@ export default function ReportCatalogPage() {
 
   const itemsPerRow = 2;
   const itemSize = (width - 80) / itemsPerRow;
+
+  // Dynamic status bar colors
+  const topBarColor = isDarkMode ? "#000000" : "#FFFFFF";
+  const topBarTextStyle = isDarkMode ? "light-content" : "dark-content";
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -134,69 +143,83 @@ export default function ReportCatalogPage() {
   );
 
   return (
-    <View style={styles.container}>
-      {/* Header Section */}
-      <View style={styles.headerSection}>
-        <Pressable style={styles.backButton} onPress={() => router.back()}>
-          <Text style={styles.backIcon}>←</Text>
-        </Pressable>
-        <Text
-          style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
-        >
-          Report History
-        </Text>
-        <Pressable style={styles.clearButton} onPress={handleClearHistory}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: topBarColor }]}>
+      <StatusBar
+        translucent={false}
+        backgroundColor={topBarColor}
+        barStyle={topBarTextStyle}
+      />
+      <View style={styles.container}>
+        {/* Header Section */}
+        <View style={styles.headerSection}>
+          <Pressable style={styles.backButton} onPress={() => router.back()}>
+            <Text style={styles.backIcon}>←</Text>
+          </Pressable>
           <Text
-            style={[
-              styles.clearButtonText,
-              isSmallScreen && styles.clearButtonTextSmall,
-            ]}
+            style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
           >
-            Clear History
+            Report History
           </Text>
-        </Pressable>
-      </View>
-
-      {/* Main Content */}
-      <ScrollView
-        style={styles.scrollContainer}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {isLoading ? (
-          <ActivityIndicator
-            size="large"
-            color="#3B9FE5"
-            style={{ marginTop: 50 }}
-          />
-        ) : reports.length > 0 ? (
-          <View style={styles.gridContainer}>
-            <FlatList
-              data={reports}
-              renderItem={renderReportItem}
-              keyExtractor={(item) => item.id}
-              numColumns={itemsPerRow}
-              scrollEnabled={false}
-              columnWrapperStyle={styles.columnWrapper}
-            />
-          </View>
-        ) : (
-          <View style={styles.emptyContainer}>
+          <Pressable style={styles.clearButton} onPress={handleClearHistory}>
             <Text
-              style={[styles.emptyText, isSmallScreen && styles.emptyTextSmall]}
+              style={[
+                styles.clearButtonText,
+                isSmallScreen && styles.clearButtonTextSmall,
+              ]}
             >
-              No reports yet
+              Clear History
             </Text>
-          </View>
-        )}
-      </ScrollView>
+          </Pressable>
+        </View>
 
-      {/* Bottom Tab Navigation */}
-      <BottomTabNavigation isSmallScreen={isSmallScreen} />
-    </View>
+        {/* Main Content */}
+        <ScrollView
+          style={styles.scrollContainer}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {isLoading ? (
+            <ActivityIndicator
+              size="large"
+              color="#3B9FE5"
+              style={{ marginTop: 50 }}
+            />
+          ) : reports.length > 0 ? (
+            <View style={styles.gridContainer}>
+              <FlatList
+                data={reports}
+                renderItem={renderReportItem}
+                keyExtractor={(item) => item.id}
+                numColumns={itemsPerRow}
+                scrollEnabled={false}
+                columnWrapperStyle={styles.columnWrapper}
+              />
+            </View>
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Text
+                style={[
+                  styles.emptyText,
+                  isSmallScreen && styles.emptyTextSmall,
+                ]}
+              >
+                No reports yet
+              </Text>
+            </View>
+          )}
+        </ScrollView>
+
+        {/* Bottom Tab Navigation */}
+        <BottomTabNavigation isSmallScreen={isSmallScreen} />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
@@ -232,20 +255,20 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   clearButton: {
-    width: 100,
+    width: 100, // Kept fixed width so headerText stays perfectly centered
     alignItems: "flex-end",
   },
   clearButtonText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#FF4444",
+    color: "#FF4444", // Assuming red for clear history
   },
   clearButtonTextSmall: {
     fontSize: 12,
   },
   scrollContainer: {
     flex: 1,
-    marginBottom: 80,
+    marginBottom: 80, // Leaves room for the absolute BottomTabNavigation
   },
   scrollContent: {
     paddingHorizontal: 20,
