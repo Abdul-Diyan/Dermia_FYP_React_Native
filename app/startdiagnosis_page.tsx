@@ -13,6 +13,7 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  Alert,
   Pressable,
   ScrollView,
   StatusBar,
@@ -74,19 +75,36 @@ export default function StartDiagnosisPage() {
           return; // Exit the function early!
         }
 
-        // 2. NO EXISTING REPORT FOUND. Simulate the ML Model processing time.
-        console.log("No previous report found. Running AI analysis...");
-        await new Promise((resolve) => setTimeout(resolve, 3000));
+       // 2. NO EXISTING REPORT FOUND. Send to Python Flask Server!
+        console.log("No previous report found. Sending to Python ML Engine...");
+        
+        // Using your actual laptop IP address!
+        //const backendUrl = "http://192.168.1.14:5000/predict";
+        const backendUrl = "https://young-cats-notice.loca.lt/predict"
+        
+        const response = await fetch(backendUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image_url: imageUrl })
+        });
 
-        // Generate the Mock Report Data
+        if (!response.ok) {
+          throw new Error(`Python Server Error: ${response.status}`);
+        }
+
+        // Parse the JSON data returned by your Flask app
+        const mlData = await response.json();
+
+        // Map the Python data to our React Native Report structure
         const newReport = {
           date: new Date().toLocaleDateString(),
-          imageId: "img_" + Math.floor(Math.random() * 1000),
+          imageId: "img_" + Date.now().toString(), 
           imageUrl: imageUrl || null,
-          predictedLesionType: "Melanoma",
-          modelConfidence: "94.77%",
-          explanation:
-            "The analyzed dermoscopic image exhibits distinct characteristics consistent with malignant melanoma.\nFrom an asymmetry perspective, the lesion shows clear imbalance in both structure and pigmentation across its vertical and horizontal axes.",
+          predictedLesionType: mlData.diagnosis, // Real diagnosis from ensemble!
+          modelConfidence: `${(mlData.confidence * 100).toFixed(2)}%`, // Real confidence!
+          // Add the Base64 image to the database so we can display it!
+          heatmapBase64: mlData.gradcam_image ? `data:image/jpeg;base64,${mlData.gradcam_image}` : null,
+          explanation: "Automated analysis completed using HAM10000 ensemble model. Please review the Grad-CAM heatmap for visual feature importance.",
         };
 
         // Save to Firestore Database securely
@@ -94,15 +112,18 @@ export default function StartDiagnosisPage() {
           ...newReport,
           createdAt: serverTimestamp(),
         });
+        
+        console.log("Success: Real ML report saved to Firestore!");
 
-        console.log("Success: New report securely saved to Firestore!");
-
-        // Update UI with the new report (and attach the real Firebase document ID)
+        // Update UI
         setReportData({ ...newReport, reportId: docRef.id });
         setIsAnalyzing(false);
-      } catch (error) {
+      }catch (error: any) {
         console.error("Failed to process report:", error);
+        // Show an actual error pop-up instead of hanging!
+        Alert.alert("Analysis Failed", "Could not complete the AI analysis. Please check your Python server terminal.");
         setIsAnalyzing(false);
+        router.back(); // Kick them back to the previous screen
       }
     };
 
@@ -147,147 +168,61 @@ export default function StartDiagnosisPage() {
             </Text>
           </View>
         ) : (
-          // SHOW THIS WHEN DONE AND DATA EXISTS
-          <ScrollView
+         <ScrollView
             style={styles.scrollContainer}
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
-            {/* Report ID */}
+            {/* Report ID (Outside the Card) */}
             <View style={styles.reportIdSection}>
-              <Text
-                style={[
-                  styles.reportIdLabel,
-                  isSmallScreen && styles.reportIdLabelSmall,
-                ]}
-              >
-                Report ID:{" "}
-                <Text
-                  style={[
-                    styles.reportIdValue,
-                    isSmallScreen && styles.reportIdValueSmall,
-                  ]}
-                >
-                  {reportData.reportId}
-                </Text>
+              <Text style={styles.reportIdText}>
+                Report ID: <Text style={styles.reportIdValue}>{reportData.reportId}</Text>
               </Text>
             </View>
 
             {/* Main Report Card */}
-            <View
-              style={[
-                styles.reportCard,
-                isSmallScreen && styles.reportCardSmall,
-              ]}
-            >
-              {/* Basic Info */}
-              {/* Show the actual uploaded image */}
-              {imageUrl && (
-                <View style={styles.uploadedImageContainer}>
-                  <Text style={styles.imageLabel}>Analyzed Image:</Text>
-                  <Image
-                    source={{ uri: imageUrl as string }}
-                    style={styles.uploadedImage}
-                    resizeMode="cover"
-                  />
-                </View>
-              )}
+            <View style={styles.mainCard}>
+              {/* Meta Info */}
+              <Text style={styles.metaText}>Date: {reportData.date}</Text>
+              <Text style={styles.metaText}>Image ID: {reportData.imageId}</Text>
 
-              {/* Diagnosis Summary */}
-              <View style={styles.summarySection}>
-                <Text
-                  style={[
-                    styles.summaryTitle,
-                    isSmallScreen && styles.summaryTitleSmall,
-                  ]}
-                >
-                  Diagnosis Summary
-                </Text>
+              {/* Diagnosis Summary Header */}
+              <Text style={styles.sectionTitle}>
+                Diagnosis Summary
+              </Text>
 
-                <Text
-                  style={[
-                    styles.summaryContent,
-                    styles.marginTop,
-                    isSmallScreen && styles.summaryContentSmall,
-                  ]}
-                >
-                  Predicted lesion type:{" "}
-                  <Text style={styles.summaryValue}>
-                    {reportData.predictedLesionType}
-                  </Text>
-                </Text>
+              {/* Results */}
+              <Text style={styles.infoText}>
+                Predicted lesion type:{" "}
+                <Text style={styles.infoValue}>{reportData.predictedLesionType}</Text>
+              </Text>
+              
+              <Text style={styles.infoText}>
+                Model Confidence:{" "}
+                <Text style={styles.infoValue}>{reportData.modelConfidence}</Text>
+              </Text>
 
-                <Text
-                  style={[
-                    styles.summaryContent,
-                    styles.marginTop,
-                    isSmallScreen && styles.summaryContentSmall,
-                  ]}
-                >
-                  Model Confidence:{" "}
-                  <Text style={styles.summaryValue}>
-                    {reportData.modelConfidence}
-                  </Text>
-                </Text>
+              <Text style={styles.infoText}>
+                <Text style={styles.infoValue}>Heatmap Visualization: </Text>
+                Shows the regions of significance
+              </Text>
 
-                {/* Heatmap Visualization */}
-                <View style={styles.heatmapSection}>
-                  <Text
-                    style={[
-                      styles.heatmapTitle,
-                      isSmallScreen && styles.heatmapTitleSmall,
-                    ]}
-                  >
-                    Heatmap Visualization:
-                  </Text>
-                  <Text
-                    style={[
-                      styles.heatmapDescription,
-                      styles.marginTop,
-                      isSmallScreen && styles.heatmapDescriptionSmall,
-                    ]}
-                  >
-                    Shows the regions of significance
-                  </Text>
-
-                  {/* Heatmap Placeholder */}
-                  <View
-                    style={[
-                      styles.heatmapPlaceholder,
-                      isSmallScreen && styles.heatmapPlaceholderSmall,
-                    ]}
-                  >
-                    <View style={styles.heatmapGradient} />
-                  </View>
-                </View>
+              {/* Single Large Heatmap Image */}
+              <View style={styles.heatmapContainer}>
+                <Image
+                  // Fallback to original image if heatmap fails to generate
+                  source={{ uri: reportData.heatmapBase64 || reportData.imageUrl }}
+                  style={styles.heatmapImage}
+                  resizeMode="cover"
+                />
               </View>
 
               {/* Explanation Section */}
-              <View style={styles.explanationSection}>
-                <Text
-                  style={[
-                    styles.explanationTitle,
-                    isSmallScreen && styles.explanationTitleSmall,
-                  ]}
-                >
-                  Explanation
+              <Text style={styles.sectionTitleSmall}>Explanation</Text>
+              <View style={styles.explanationBox}>
+                <Text style={styles.explanationText}>
+                  {reportData.explanation}
                 </Text>
-
-                <View
-                  style={[
-                    styles.explanationBox,
-                    isSmallScreen && styles.explanationBoxSmall,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.explanationText,
-                      isSmallScreen && styles.explanationTextSmall,
-                    ]}
-                  >
-                    {reportData.explanation}
-                  </Text>
-                </View>
               </View>
             </View>
           </ScrollView>
@@ -346,131 +281,70 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingBottom: 40,
   },
+  // --- New Report UI Styles ---
   reportIdSection: {
-    marginBottom: 16,
+    marginBottom: 8,
+    paddingHorizontal: 4,
   },
-  reportIdLabel: {
-    fontSize: 16,
+  reportIdText: {
+    fontSize: 14,
     color: "#333333",
-    fontWeight: "600",
-  },
-  reportIdLabelSmall: {
-    fontSize: 13,
   },
   reportIdValue: {
     color: "#3B9FE5",
-    fontWeight: "700",
   },
-  reportIdValueSmall: {
-    fontSize: 14,
-  },
-  reportCard: {
+  mainCard: {
     backgroundColor: "#FFFFFF",
-    borderWidth: 2,
-    borderColor: "#3B9FE5",
-    borderRadius: 16,
-    padding: 20,
-  },
-  reportCardSmall: {
-    padding: 14,
-  },
-  basicInfo: {
-    marginBottom: 20,
-  },
-  basicInfoText: {
-    fontSize: 14,
-    color: "#333333",
-    fontWeight: "500",
-  },
-  basicInfoTextSmall: {
-    fontSize: 12,
-  },
-  marginTop: {
-    marginTop: 8,
-  },
-  summarySection: {
-    marginBottom: 24,
-  },
-  summaryTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#3B9FE5",
-  },
-  summaryTitleSmall: {
-    fontSize: 15,
-  },
-  summaryContent: {
-    fontSize: 14,
-    color: "#333333",
-    fontWeight: "500",
-  },
-  summaryContentSmall: {
-    fontSize: 12,
-  },
-  summaryValue: {
-    color: "#3B9FE5",
-    fontWeight: "700",
-  },
-  heatmapSection: {
-    marginTop: 20,
-  },
-  heatmapTitle: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#3B9FE5",
-  },
-  heatmapTitleSmall: {
-    fontSize: 12,
-  },
-  heatmapDescription: {
-    fontSize: 14,
-    color: "#333333",
-  },
-  heatmapDescriptionSmall: {
-    fontSize: 12,
-  },
-  heatmapPlaceholder: {
-    width: "100%",
-    height: 220,
-    backgroundColor: "#000000",
-    borderRadius: 8,
-    marginTop: 12,
-    overflow: "hidden",
-  },
-  heatmapPlaceholderSmall: {
-    height: 160,
-  },
-  heatmapGradient: {
-    width: "100%",
-    height: "100%",
-    backgroundColor: "transparent",
-    backgroundImage:
-      "radial-gradient(circle at center, rgba(255, 0, 0, 1), rgba(255, 255, 0, 0.8), rgba(0, 255, 0, 0.6), rgba(0, 0, 255, 1))",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  explanationSection: {
-    marginTop: 20,
-  },
-  explanationTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#3B9FE5",
-    marginBottom: 12,
-  },
-  explanationTitleSmall: {
-    fontSize: 15,
-    marginBottom: 10,
-  },
-  explanationBox: {
-    backgroundColor: "#FFFFFF",
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: "#3B9FE5",
     borderRadius: 12,
     padding: 16,
   },
-  explanationBoxSmall: {
-    padding: 12,
+  metaText: {
+    fontSize: 14,
+    color: "#333333",
+    marginBottom: 6,
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#3B9FE5",
+    marginTop: 12,
+    marginBottom: 12,
+  },
+  sectionTitleSmall: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#3B9FE5",
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  infoText: {
+    fontSize: 14,
+    color: "#333333",
+    marginBottom: 8,
+  },
+  infoValue: {
+    fontWeight: "bold",
+    color: "#3B9FE5",
+  },
+  heatmapContainer: {
+    alignItems: "center",
+    marginTop: 12,
+    marginBottom: 16,
+  },
+  heatmapImage: {
+    width: "95%",
+    height: 220,
+    borderWidth: 2,
+    borderColor: "#000000", // The bold black border from Image 1
+  },
+  explanationBox: {
+    borderWidth: 1.5,
+    borderColor: "#3B9FE5",
+    borderRadius: 8,
+    padding: 16,
+    backgroundColor: "#FFFFFF",
   },
   explanationText: {
     fontSize: 14,
@@ -514,6 +388,25 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 12,
     borderWidth: 1,
+    borderColor: "#E0E0E0",
+  },
+  // --- New Dual Image Styles ---
+  imageComparisonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginBottom: 24,
+    gap: 12,
+  },
+  imageWrapper: {
+    flex: 1,
+    alignItems: "center",
+  },
+  scanImage: {
+    width: "100%",
+    aspectRatio: 1, // Forces it to be a perfect square!
+    borderRadius: 12,
+    borderWidth: 2,
     borderColor: "#E0E0E0",
   },
 });
