@@ -25,6 +25,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../config/firebaseConfig";
+import { BACKEND_URL } from "../constants/apiConfig";
 
 export default function StartDiagnosisPage() {
   const { width, height } = useWindowDimensions();
@@ -80,9 +81,10 @@ export default function StartDiagnosisPage() {
         
         // Using your actual laptop IP address!
         //const backendUrl = "http://192.168.1.14:5000/predict";
-        const backendUrl = "https://young-cats-notice.loca.lt/predict"
-        
-        const response = await fetch(backendUrl, {
+        //const backendUrl = "https://young-cats-notice.loca.lt/predict"
+        const fetchUrl = `${BACKEND_URL}/predict`;
+
+        const response = await fetch(fetchUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ image_url: imageUrl })

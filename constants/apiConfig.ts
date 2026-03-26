@@ -1,0 +1,1 @@
+export const BACKEND_URL = "https://honest-signs-thank.loca.lt";
