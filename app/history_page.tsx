@@ -19,7 +19,6 @@ export default function HistoryPage() {
   const isDarkMode = colorScheme === "dark";
   const isSmallScreen = width < 400;
 
-  // Dynamic status bar colors
   const topBarColor = isDarkMode ? "#000000" : "#FFFFFF";
   const topBarTextStyle = isDarkMode ? "light-content" : "dark-content";
 
@@ -43,7 +42,6 @@ export default function HistoryPage() {
         barStyle={topBarTextStyle}
       />
       <View style={styles.container}>
-        {/* Header Section */}
         <View style={styles.headerSection}>
           <Pressable style={styles.backButton} onPress={() => router.back()}>
             <Text style={styles.backIcon}>←</Text>
@@ -56,13 +54,11 @@ export default function HistoryPage() {
           <View style={{ width: 50 }} />
         </View>
 
-        {/* Main Content */}
         <ScrollView
           style={styles.scrollContainer}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* History List */}
           {historyItems.map((item) => (
             <Pressable
               key={item.id}
@@ -103,7 +99,6 @@ export default function HistoryPage() {
           ))}
         </ScrollView>
 
-        {/* Bottom Tab Navigation */}
         <BottomTabNavigation isSmallScreen={isSmallScreen} />
       </View>
     </SafeAreaView>
@@ -150,7 +145,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1,
-    marginBottom: 80, // Space for BottomTabNavigation
+    marginBottom: 80,
   },
   scrollContent: {
     paddingHorizontal: 20,

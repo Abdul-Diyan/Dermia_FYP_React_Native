@@ -28,11 +28,9 @@ export default function DashboardPage() {
   const [recentReports, setRecentReports] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Dynamic status bar colors
   const topBarColor = isDarkMode ? "#000000" : "#FFFFFF";
   const topBarTextStyle = isDarkMode ? "light-content" : "dark-content";
 
-  // useFocusEffect runs every time this screen becomes the active screen
   useFocusEffect(
     useCallback(() => {
       const fetchDashboardData = async () => {
@@ -40,7 +38,6 @@ export default function DashboardPage() {
           const user = auth.currentUser;
           if (!user) return;
 
-          // 1. Fetch the 3 most recent images
           const imagesRef = collection(db, "users", user.uid, "images");
           const qImages = query(
             imagesRef,
@@ -55,7 +52,6 @@ export default function DashboardPage() {
           );
           setRecentImages(fetchedImages);
 
-          // 2. Fetch the 2 most recent reports
           const reportsRef = collection(db, "users", user.uid, "reports");
           const qReports = query(
             reportsRef,
@@ -97,13 +93,11 @@ export default function DashboardPage() {
           </Text>
         </View>
 
-        {/* Main Content */}
         <ScrollView
           style={styles.scrollContainer}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Browse Images Section */}
           <View
             style={[
               styles.cardContainer,
@@ -126,7 +120,6 @@ export default function DashboardPage() {
                     />
                   ))
                 ) : (
-                  // The Visual Empty State for Images
                   <Pressable
                     style={[
                       styles.emptyPlaceholderCard,
@@ -165,7 +158,6 @@ export default function DashboardPage() {
             </Pressable>
           </View>
 
-          {/* Previous Report History Section */}
           <View
             style={[
               styles.cardContainer,
@@ -208,7 +200,6 @@ export default function DashboardPage() {
                     </Pressable>
                   ))
                 ) : (
-                  // The Visual Empty State for Reports
                   <Pressable
                     style={[
                       styles.emptyPlaceholderCard,
@@ -235,7 +226,6 @@ export default function DashboardPage() {
             </Pressable>
           </View>
 
-          {/* Start Diagnosis Button */}
           <View style={styles.section}>
             <Pressable
               style={({ pressed }) => [
@@ -281,7 +271,6 @@ export default function DashboardPage() {
           </View>
         </ScrollView>
 
-        {/* Bottom Tab Navigation */}
         <BottomTabNavigation isSmallScreen={isSmallScreen} />
       </View>
     </SafeAreaView>
@@ -317,7 +306,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingVertical: 24,
-    paddingBottom: 100, // Important: leaves room for the absolute BottomTabNavigation
+    paddingBottom: 100,
   },
   section: {
     marginTop: 32,
@@ -343,7 +332,7 @@ const styles = StyleSheet.create({
     borderColor: "#0a73ff",
     padding: 20,
     alignItems: "center",
-    marginBottom: 24, // Adds space between the cards
+    marginBottom: 24,
   },
   cardContainerSmall: {
     padding: 16,
@@ -455,7 +444,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontWeight: "500",
   },
-  // --- Empty State Styles ---
   emptyPlaceholderCard: {
     width: 100,
     height: 100,

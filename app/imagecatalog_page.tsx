@@ -35,7 +35,6 @@ export default function ImageCatalogPage() {
   const isDarkMode = colorScheme === "dark";
   const isSmallScreen = width < 400;
 
-  // Catch the mode ("manage", "select", or "upload")
   const { mode } = useLocalSearchParams<{ mode: string }>();
 
   const [images, setImages] = useState<any[]>([]);
@@ -46,7 +45,6 @@ export default function ImageCatalogPage() {
   const itemsPerRow = 3;
   const itemSize = (width - 60) / itemsPerRow - 10;
 
-  // Dynamic status bar colors
   const topBarColor = isDarkMode ? "#000000" : "#FFFFFF";
   const topBarTextStyle = isDarkMode ? "light-content" : "dark-content";
 
@@ -75,7 +73,6 @@ export default function ImageCatalogPage() {
 
     fetchImages();
 
-    // Auto-open gallery if they clicked "Upload New Photo" on dashboard
     if (mode === "upload") {
       pickAndUploadImage();
     }
@@ -124,7 +121,6 @@ export default function ImageCatalogPage() {
 
       const secureImageUrl = responseData.secure_url;
 
-      // Save to Firestore
       const user = auth.currentUser;
       let newDocId = Date.now().toString();
 
@@ -139,7 +135,6 @@ export default function ImageCatalogPage() {
 
       setImages((prev) => [{ id: newDocId, url: secureImageUrl }, ...prev]);
 
-      // If uploading for a new diagnosis, jump straight to the diagnosis page
       if (mode === "upload") {
         router.push({
           pathname: "/startdiagnosis_page",
@@ -239,7 +234,6 @@ export default function ImageCatalogPage() {
         barStyle={topBarTextStyle}
       />
       <View style={styles.container}>
-        {/* Header Section */}
         <View style={styles.headerSection}>
           <Pressable style={styles.backButton} onPress={() => router.back()}>
             <Text style={styles.backIcon}>←</Text>
@@ -252,7 +246,6 @@ export default function ImageCatalogPage() {
           <View style={{ width: 50 }} />
         </View>
 
-        {/* Main Content */}
         <ScrollView
           style={styles.scrollContainer}
           contentContainerStyle={styles.scrollContent}
@@ -294,7 +287,6 @@ export default function ImageCatalogPage() {
           </View>
         </ScrollView>
 
-        {/* Select Button (Hidden in Manage mode) */}
         {mode !== "manage" && (
           <View style={styles.buttonContainer}>
             <Pressable
@@ -329,7 +321,6 @@ export default function ImageCatalogPage() {
           </View>
         )}
 
-        {/* Bottom Tab Navigation */}
         <BottomTabNavigation isSmallScreen={isSmallScreen} />
       </View>
     </SafeAreaView>

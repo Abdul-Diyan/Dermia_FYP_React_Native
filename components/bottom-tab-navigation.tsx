@@ -12,7 +12,7 @@ export default function BottomTabNavigation({
   const pathname = usePathname();
 
   const handleHistoryPress = () => {
-    router.push("/history_page");
+    router.push("/reportcatalog_page");
   };
 
   const handleHomePress = () => {

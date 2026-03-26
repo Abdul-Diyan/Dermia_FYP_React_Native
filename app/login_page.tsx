@@ -27,12 +27,10 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
 
-  // Dynamic status bar colors
   const topBarColor = isDarkMode ? "#000000" : "#FFFFFF";
   const topBarTextStyle = isDarkMode ? "light-content" : "dark-content";
 
   const handleLogin = async () => {
-    // Web & Mobile Alert Helper
     const showAlert = (title: string, message: string) => {
       if (Platform.OS === "web") {
         window.alert(`${title}: \n${message}`);
@@ -41,13 +39,11 @@ export default function LoginPage() {
       }
     };
 
-    // 1. Basic Validation
     if (!email || !password) {
       showAlert("Error", "Please enter both email and password.");
       return;
     }
 
-    // 2. Talk to Firebase
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
@@ -57,11 +53,9 @@ export default function LoginPage() {
       console.log("Logged in:", userCredential.user.email);
       showAlert("Success", "Welcome back!");
 
-      // Navigate to the main dashboard or diagnosis page
       router.push("/dashboard_page");
     } catch (error: any) {
       console.error(error);
-      // Give a friendly error message for bad credentials
       if (error.code === "auth/invalid-credential") {
         showAlert("Login Failed", "Incorrect email or password.");
       } else {
@@ -83,7 +77,6 @@ export default function LoginPage() {
         bounces={false}
         showsHorizontalScrollIndicator={false}
       >
-        {/* Header Section with Blue Background */}
         <View style={[styles.headerSection, { minHeight: height * 0.25 }]}>
           <Text
             style={[styles.titleText, isSmallScreen && styles.titleTextSmall]}
@@ -92,7 +85,6 @@ export default function LoginPage() {
           </Text>
         </View>
 
-        {/* Form Container */}
         <View
           style={[
             styles.formContainer,
@@ -100,7 +92,6 @@ export default function LoginPage() {
             { width: isSmallScreen ? width * 0.9 : width * 0.85 }, // Ensures form stays centered and responsive
           ]}
         >
-          {/* Subtitle */}
           <Text
             style={[
               styles.subtitleText,
@@ -110,7 +101,6 @@ export default function LoginPage() {
             Login to existing Account
           </Text>
 
-          {/* Email Input */}
           <View style={styles.inputGroup}>
             <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
               Email or username
@@ -126,7 +116,6 @@ export default function LoginPage() {
             />
           </View>
 
-          {/* Password Input */}
           <View style={styles.inputGroup}>
             <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
               Password
@@ -141,7 +130,6 @@ export default function LoginPage() {
             />
           </View>
 
-          {/* Remember Me & Forgot Password */}
           <View style={styles.optionsContainer}>
             <Pressable
               style={styles.rememberMeContainer}
@@ -173,7 +161,6 @@ export default function LoginPage() {
             </Pressable>
           </View>
 
-          {/* Login Button */}
           <Pressable
             style={({ pressed }) => [
               styles.loginButton,
@@ -192,7 +179,6 @@ export default function LoginPage() {
             </Text>
           </Pressable>
 
-          {/* Sign Up Link */}
           <View style={styles.signupContainer}>
             <Text
               style={[
@@ -229,7 +215,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flexGrow: 1,
-    alignItems: "center", // Keeps the header and form horizontally centered
+    alignItems: "center",
     paddingBottom: 40,
   },
   headerSection: {
@@ -238,7 +224,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderBottomLeftRadius: 32,
     borderBottomRightRadius: 32,
-    paddingBottom: 40, // Added more padding so the form overlaps nicely
+    paddingBottom: 40,
     width: "100%",
     overflow: "hidden",
   },
@@ -254,7 +240,7 @@ const styles = StyleSheet.create({
   formContainer: {
     backgroundColor: "#FFFFFF",
     borderRadius: 24,
-    marginTop: -40, // Overlaps the form slightly over the blue header
+    marginTop: -40,
     paddingHorizontal: 24,
     paddingVertical: 32,
     elevation: 8,
@@ -338,7 +324,6 @@ const styles = StyleSheet.create({
   checkboxLabel: {
     fontSize: 14,
     color: "#999999",
-    // Make sure the label doesn't push the forgot password text out on small screens
     maxWidth: 100,
   },
   checkboxLabelSmall: {

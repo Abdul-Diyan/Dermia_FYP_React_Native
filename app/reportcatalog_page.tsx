@@ -39,7 +39,6 @@ export default function ReportCatalogPage() {
   const itemsPerRow = 2;
   const itemSize = (width - 80) / itemsPerRow;
 
-  // Dynamic status bar colors
   const topBarColor = isDarkMode ? "#000000" : "#FFFFFF";
   const topBarTextStyle = isDarkMode ? "light-content" : "dark-content";
 
@@ -49,7 +48,6 @@ export default function ReportCatalogPage() {
         const user = auth.currentUser;
         if (!user) return;
 
-        // Fetch only the 5 most recent reports!
         const reportsRef = collection(db, "users", user.uid, "reports");
         const q = query(reportsRef, orderBy("createdAt", "desc"), limit(5));
         const snapshot = await getDocs(q);
@@ -84,7 +82,6 @@ export default function ReportCatalogPage() {
               const user = auth.currentUser;
               if (!user) return;
 
-              // Batch delete from Firestore
               const batch = writeBatch(db);
               reports.forEach((report) => {
                 const reportRef = doc(
@@ -98,7 +95,7 @@ export default function ReportCatalogPage() {
               });
 
               await batch.commit();
-              setReports([]); // Clear UI
+              setReports([]);
               Alert.alert("Success", "History cleared.");
             } catch (error) {
               console.error("Error clearing history:", error);
@@ -114,18 +111,16 @@ export default function ReportCatalogPage() {
     <Pressable
       style={[
         styles.reportCard,
-        { width: itemSize, height: itemSize + 40 }, // Added height for the image
+        { width: itemSize, height: itemSize + 40 },
         isSmallScreen && styles.reportCardSmall,
       ]}
       onPress={() => {
-        // Route to diagnosis page and pass image URL to trigger the smart cache!
         router.push({
           pathname: "/startdiagnosis_page",
           params: { imageUrl: item.imageUrl },
         });
       }}
     >
-      {/* Show the actual skin lesion image thumbnail */}
       {item.imageUrl ? (
         <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
       ) : (
@@ -150,7 +145,6 @@ export default function ReportCatalogPage() {
         barStyle={topBarTextStyle}
       />
       <View style={styles.container}>
-        {/* Header Section */}
         <View style={styles.headerSection}>
           <Pressable style={styles.backButton} onPress={() => router.back()}>
             <Text style={styles.backIcon}>←</Text>
@@ -172,7 +166,6 @@ export default function ReportCatalogPage() {
           </Pressable>
         </View>
 
-        {/* Main Content */}
         <ScrollView
           style={styles.scrollContainer}
           contentContainerStyle={styles.scrollContent}
@@ -209,7 +202,6 @@ export default function ReportCatalogPage() {
           )}
         </ScrollView>
 
-        {/* Bottom Tab Navigation */}
         <BottomTabNavigation isSmallScreen={isSmallScreen} />
       </View>
     </SafeAreaView>
@@ -255,20 +247,20 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   clearButton: {
-    width: 100, // Kept fixed width so headerText stays perfectly centered
+    width: 100,
     alignItems: "flex-end",
   },
   clearButtonText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#FF4444", // Assuming red for clear history
+    color: "#FF4444",
   },
   clearButtonTextSmall: {
     fontSize: 12,
   },
   scrollContainer: {
     flex: 1,
-    marginBottom: 80, // Leaves room for the absolute BottomTabNavigation
+    marginBottom: 80,
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -298,7 +290,7 @@ const styles = StyleSheet.create({
   },
   cardImage: {
     width: "100%",
-    height: "60%", // Take up the top portion of the card
+    height: "60%",
     borderRadius: 8,
     marginBottom: 8,
   },

@@ -24,7 +24,6 @@ export default function ForgetPasswordPage() {
   const isSmallScreen = width < 400;
   const [email, setEmail] = useState("");
 
-  // Dynamic status bar colors
   const topBarColor = isDarkMode ? "#000000" : "#FFFFFF";
   const topBarTextStyle = isDarkMode ? "light-content" : "dark-content";
 
@@ -55,7 +54,6 @@ export default function ForgetPasswordPage() {
           "We couldn't find an account registered with that email.",
         );
       } else {
-        // A generic fallback for any other weird errors
         Alert.alert("Failed", "Something went wrong. Please try again.");
       }
     }
@@ -74,7 +72,6 @@ export default function ForgetPasswordPage() {
         bounces={false}
         showsHorizontalScrollIndicator={false}
       >
-        {/* Header Section with Blue Background */}
         <View style={[styles.headerSection, { minHeight: height * 0.35 }]}>
           <Text
             style={[styles.titleText, isSmallScreen && styles.titleTextSmall]}
@@ -109,15 +106,13 @@ export default function ForgetPasswordPage() {
           </View>
         </View>
 
-        {/* Form Container */}
         <View
           style={[
             styles.formContainer,
             isSmallScreen && styles.formContainerSmall,
-            { width: isSmallScreen ? width * 0.9 : width * 0.85 }, // Keeps form width consistent with other pages
+            { width: isSmallScreen ? width * 0.9 : width * 0.85 },
           ]}
         >
-          {/* Email Input */}
           <View style={styles.inputGroup}>
             <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
               Email
@@ -133,7 +128,6 @@ export default function ForgetPasswordPage() {
             />
           </View>
 
-          {/* Reset Password Button */}
           <Pressable
             style={({ pressed }) => [
               styles.resetButton,
@@ -152,7 +146,6 @@ export default function ForgetPasswordPage() {
             </Text>
           </Pressable>
 
-          {/* Back to Login Link */}
           <View style={styles.backToLoginContainer}>
             <Text
               style={[styles.backText, isSmallScreen && styles.backTextSmall]}
@@ -192,7 +185,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderBottomLeftRadius: 32,
     borderBottomRightRadius: 32,
-    paddingBottom: 40, // Increased to allow the form to overlap cleanly
+    paddingBottom: 40,
     width: "100%",
     overflow: "hidden",
   },
@@ -223,7 +216,7 @@ const styles = StyleSheet.create({
   formContainer: {
     backgroundColor: "#FFFFFF",
     borderRadius: 24,
-    marginTop: -40, // Keeps the overlap uniform across all auth pages
+    marginTop: -40,
     paddingHorizontal: 24,
     paddingVertical: 32,
     elevation: 8,

@@ -27,7 +27,6 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // Dynamic status bar colors
   const topBarColor = isDarkMode ? "#000000" : "#FFFFFF";
   const topBarTextStyle = isDarkMode ? "light-content" : "dark-content";
 
@@ -69,7 +68,6 @@ export default function SignupPage() {
         bounces={false}
         showsHorizontalScrollIndicator={false}
       >
-        {/* Header Section with Blue Background */}
         <View style={[styles.headerSection, { minHeight: height * 0.25 }]}>
           <Text
             style={[styles.titleText, isSmallScreen && styles.titleTextSmall]}
@@ -78,7 +76,6 @@ export default function SignupPage() {
           </Text>
         </View>
 
-        {/* Form Container */}
         <View
           style={[
             styles.formContainer,
@@ -86,7 +83,6 @@ export default function SignupPage() {
             { width: isSmallScreen ? width * 0.9 : width * 0.85 }, // Ensures form stays centered and responsive
           ]}
         >
-          {/* Subtitle */}
           <Text
             style={[
               styles.subtitleText,
@@ -96,7 +92,6 @@ export default function SignupPage() {
             Create a new Account
           </Text>
 
-          {/* Email Input */}
           <View style={styles.inputGroup}>
             <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
               Email
@@ -112,7 +107,6 @@ export default function SignupPage() {
             />
           </View>
 
-          {/* Username Input */}
           <View style={styles.inputGroup}>
             <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
               Username
@@ -127,7 +121,6 @@ export default function SignupPage() {
             />
           </View>
 
-          {/* Password Input */}
           <View style={styles.inputGroup}>
             <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
               Password
@@ -142,7 +135,6 @@ export default function SignupPage() {
             />
           </View>
 
-          {/* Confirm Password Input */}
           <View style={styles.inputGroup}>
             <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
               Confirm Password
@@ -157,7 +149,6 @@ export default function SignupPage() {
             />
           </View>
 
-          {/* Sign Up Button */}
           <View style={{ marginTop: 12 }}>
             <Pressable
               style={({ pressed }) => [
@@ -178,7 +169,6 @@ export default function SignupPage() {
             </Pressable>
           </View>
 
-          {/* Already Have Account Link */}
           <View style={styles.loginContainer}>
             <Text
               style={[styles.loginText, isSmallScreen && styles.loginTextSmall]}
@@ -212,7 +202,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flexGrow: 1,
-    alignItems: "center", // Keeps the header and form horizontally centered
+    alignItems: "center",
     paddingBottom: 40,
   },
   headerSection: {
@@ -221,7 +211,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderBottomLeftRadius: 32,
     borderBottomRightRadius: 32,
-    paddingBottom: 40, // Match login page padding so the form overlaps nicely
+    paddingBottom: 40,
     width: "100%",
     overflow: "hidden",
   },
@@ -237,7 +227,7 @@ const styles = StyleSheet.create({
   formContainer: {
     backgroundColor: "#FFFFFF",
     borderRadius: 24,
-    marginTop: -40, // Match login page overlap
+    marginTop: -40,
     paddingHorizontal: 24,
     paddingVertical: 32,
     elevation: 8,

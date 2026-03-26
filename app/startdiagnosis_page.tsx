@@ -36,10 +36,8 @@ export default function StartDiagnosisPage() {
   const { imageUrl } = useLocalSearchParams();
   const [isAnalyzing, setIsAnalyzing] = useState(true);
 
-  // 1. Make reportData a state variable so we can update it after "Analysis"
   const [reportData, setReportData] = useState<any>(null);
 
-  // Dynamic status bar colors
   const topBarColor = isDarkMode ? "#000000" : "#FFFFFF";
   const topBarTextStyle = isDarkMode ? "light-content" : "dark-content";
 
@@ -55,7 +53,6 @@ export default function StartDiagnosisPage() {
 
         const userReportsRef = collection(db, "users", user.uid, "reports");
 
-        // 1. CHECK FIRESTORE FOR AN EXISTING REPORT FIRST
         const q = query(
           userReportsRef,
           where("imageUrl", "==", imageUrl),
@@ -64,19 +61,17 @@ export default function StartDiagnosisPage() {
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
-          // WE FOUND IT! Load instantly and skip the ML model.
           console.log("Existing report found! Skipping ML prediction.");
           const existingData = querySnapshot.docs[0].data();
 
           setReportData({
-            reportId: querySnapshot.docs[0].id, // Use the real database ID
+            reportId: querySnapshot.docs[0].id,
             ...existingData,
           });
           setIsAnalyzing(false);
-          return; // Exit the function early!
+          return;
         }
 
-        // 2. NO EXISTING REPORT FOUND. Send to Python Flask Server!
         console.log("No previous report found. Sending to Python ML Engine...");
 
         // Using your actual laptop IP address!
@@ -94,17 +89,14 @@ export default function StartDiagnosisPage() {
           throw new Error(`Python Server Error: ${response.status}`);
         }
 
-        // Parse the JSON data returned by your Flask app
         const mlData = await response.json();
 
-        // Map the Python data to our React Native Report structure
         const newReport = {
           date: new Date().toLocaleDateString(),
           imageId: "img_" + Date.now().toString(),
           imageUrl: imageUrl || null,
-          predictedLesionType: mlData.diagnosis, // Real diagnosis from ensemble!
-          modelConfidence: `${(mlData.confidence * 100).toFixed(2)}%`, // Real confidence!
-          // Add the Base64 image to the database so we can display it!
+          predictedLesionType: mlData.diagnosis,
+          modelConfidence: `${(mlData.confidence * 100).toFixed(2)}%`,
           heatmapBase64: mlData.gradcam_image
             ? `data:image/jpeg;base64,${mlData.gradcam_image}`
             : null,
@@ -112,7 +104,6 @@ export default function StartDiagnosisPage() {
             "Automated analysis completed using HAM10000 ensemble model. Please review the Grad-CAM heatmap for visual feature importance.",
         };
 
-        // Save to Firestore Database securely
         const docRef = await addDoc(userReportsRef, {
           ...newReport,
           createdAt: serverTimestamp(),
@@ -120,18 +111,16 @@ export default function StartDiagnosisPage() {
 
         console.log("Success: Real ML report saved to Firestore!");
 
-        // Update UI
         setReportData({ ...newReport, reportId: docRef.id });
         setIsAnalyzing(false);
       } catch (error: any) {
         console.error("Failed to process report:", error);
-        // Show an actual error pop-up instead of hanging!
         Alert.alert(
           "Analysis Failed",
           "Could not complete the AI analysis. Please check your Python server terminal.",
         );
         setIsAnalyzing(false);
-        router.back(); // Kick them back to the previous screen
+        router.back();
       }
     };
 
@@ -150,7 +139,6 @@ export default function StartDiagnosisPage() {
         barStyle={topBarTextStyle}
       />
       <View style={styles.container}>
-        {/* Header Section */}
         <View style={styles.headerSection}>
           <Pressable style={styles.backButton} onPress={() => router.back()}>
             <Text style={styles.backIcon}>←</Text>
@@ -163,9 +151,7 @@ export default function StartDiagnosisPage() {
           <View style={{ width: 50 }} />
         </View>
 
-        {/* Main Content */}
         {isAnalyzing || !reportData ? (
-          // SHOW THIS WHILE "ANALYZING" OR WAITING FOR DATA
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#3B9FE5" />
             <Text style={styles.loadingText}>
@@ -181,7 +167,6 @@ export default function StartDiagnosisPage() {
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
-            {/* Report ID (Outside the Card) */}
             <View style={styles.reportIdSection}>
               <Text style={styles.reportIdText}>
                 Report ID:{" "}
@@ -189,18 +174,13 @@ export default function StartDiagnosisPage() {
               </Text>
             </View>
 
-            {/* Main Report Card */}
             <View style={styles.mainCard}>
               {/* Meta Info */}
               <Text style={styles.metaText}>Date: {reportData.date}</Text>
               <Text style={styles.metaText}>
                 Image ID: {reportData.imageId}
               </Text>
-
-              {/* Diagnosis Summary Header */}
               <Text style={styles.sectionTitle}>Diagnosis Summary</Text>
-
-              {/* Results */}
               <Text style={styles.infoText}>
                 Predicted lesion type:{" "}
                 <Text style={styles.infoValue}>
@@ -220,10 +200,8 @@ export default function StartDiagnosisPage() {
                 Shows the regions of significance
               </Text>
 
-              {/* Single Large Heatmap Image */}
               <View style={styles.heatmapContainer}>
                 <Image
-                  // Fallback to original image if heatmap fails to generate
                   source={{
                     uri: reportData.heatmapBase64 || reportData.imageUrl,
                   }}
@@ -231,8 +209,6 @@ export default function StartDiagnosisPage() {
                   resizeMode="cover"
                 />
               </View>
-
-              {/* Explanation Section */}
               <Text style={styles.sectionTitleSmall}>Explanation</Text>
               <View style={styles.explanationBox}>
                 <Text style={styles.explanationText}>
@@ -242,7 +218,6 @@ export default function StartDiagnosisPage() {
             </View>
           </ScrollView>
         )}
-        {/* Bottom Tab Navigation */}
         <BottomTabNavigation isSmallScreen={isSmallScreen} />
       </View>
     </SafeAreaView>
@@ -289,14 +264,13 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1,
-    marginBottom: 80, // Leaves room for the bottom tab navigation
+    marginBottom: 80,
   },
   scrollContent: {
     paddingHorizontal: 20,
     paddingVertical: 20,
     paddingBottom: 40,
   },
-  // --- New Report UI Styles ---
   reportIdSection: {
     marginBottom: 8,
     paddingHorizontal: 4,
@@ -352,7 +326,7 @@ const styles = StyleSheet.create({
     width: "95%",
     height: 220,
     borderWidth: 2,
-    borderColor: "#000000", // The bold black border from Image 1
+    borderColor: "#000000",
   },
   explanationBox: {
     borderWidth: 1.5,
@@ -405,7 +379,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E0E0E0",
   },
-  // --- New Dual Image Styles ---
   imageComparisonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -419,7 +392,7 @@ const styles = StyleSheet.create({
   },
   scanImage: {
     width: "100%",
-    aspectRatio: 1, // Forces it to be a perfect square!
+    aspectRatio: 1,
     borderRadius: 12,
     borderWidth: 2,
     borderColor: "#E0E0E0",

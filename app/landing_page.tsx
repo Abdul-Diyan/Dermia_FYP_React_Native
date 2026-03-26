@@ -8,26 +8,23 @@ import {
   StyleSheet,
   Text,
   useColorScheme,
-  useWindowDimensions, // 1. Added this import to detect system theme
+  useWindowDimensions,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const LandingPage = () => {
   const { width, height } = useWindowDimensions();
-  const colorScheme = useColorScheme(); // 2. Check if the phone is in dark or light mode
+  const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark";
 
   const isSmallScreen = width < 400;
 
-  // 3. Set the colors dynamically based on the phone's theme
-  const topBarColor = isDarkMode ? "#000000" : "#FFFFFF"; // Black in dark mode, white in light mode
-  const topBarTextStyle = isDarkMode ? "light-content" : "dark-content"; // White text in dark mode, dark text in light mode
+  const topBarColor = isDarkMode ? "#000000" : "#FFFFFF";
+  const topBarTextStyle = isDarkMode ? "light-content" : "dark-content";
 
   return (
-    // 4. Apply the dynamic background color to the SafeAreaView
     <SafeAreaView style={[styles.safeArea, { backgroundColor: topBarColor }]}>
-      {/* 5. Apply the dynamic colors to the StatusBar */}
       <StatusBar
         translucent={false}
         backgroundColor={topBarColor}

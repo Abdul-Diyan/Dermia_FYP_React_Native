@@ -27,11 +27,9 @@ export default function UserProfilePage() {
   const [name, setName] = useState("Rohaan Khuram");
   const [email, setEmail] = useState("rohaankhuram@gmail.com");
 
-  // Dynamic status bar colors
   const topBarColor = isDarkMode ? "#000000" : "#FFFFFF";
   const topBarTextStyle = isDarkMode ? "light-content" : "dark-content";
 
-  // Fetch the user's real email when the page loads
   useEffect(() => {
     const user = auth.currentUser;
     if (user && user.email) {
@@ -58,7 +56,6 @@ export default function UserProfilePage() {
         barStyle={topBarTextStyle}
       />
       <View style={styles.container}>
-        {/* Header Section */}
         <View style={styles.headerSection}>
           <Pressable style={styles.backButton} onPress={() => router.back()}>
             <Text style={styles.backIcon}>←</Text>
@@ -81,7 +78,6 @@ export default function UserProfilePage() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Profile Avatar */}
           <View
             style={[
               styles.avatarContainer,
@@ -104,14 +100,12 @@ export default function UserProfilePage() {
             </View>
           </View>
 
-          {/* Profile Info */}
           <View
             style={[
               styles.infoContainer,
               isSmallScreen && styles.infoContainerSmall,
             ]}
           >
-            {/* Name */}
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
                 Full Name
@@ -134,7 +128,6 @@ export default function UserProfilePage() {
               )}
             </View>
 
-            {/* Email */}
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
                 Email
@@ -160,7 +153,6 @@ export default function UserProfilePage() {
             </View>
           </View>
 
-          {/* Logout Button */}
           <Pressable
             style={({ pressed }) => [
               styles.logoutButton,
