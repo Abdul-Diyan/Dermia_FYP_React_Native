@@ -12,8 +12,8 @@ import {
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Image,
   Alert,
+  Image,
   Pressable,
   ScrollView,
   StatusBar,
@@ -76,18 +76,18 @@ export default function StartDiagnosisPage() {
           return; // Exit the function early!
         }
 
-       // 2. NO EXISTING REPORT FOUND. Send to Python Flask Server!
+        // 2. NO EXISTING REPORT FOUND. Send to Python Flask Server!
         console.log("No previous report found. Sending to Python ML Engine...");
-        
+
         // Using your actual laptop IP address!
         //const backendUrl = "http://192.168.1.14:5000/predict";
         //const backendUrl = "https://young-cats-notice.loca.lt/predict"
         const fetchUrl = `${BACKEND_URL}/predict`;
 
         const response = await fetch(fetchUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image_url: imageUrl })
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image_url: imageUrl }),
         });
 
         if (!response.ok) {
@@ -100,13 +100,16 @@ export default function StartDiagnosisPage() {
         // Map the Python data to our React Native Report structure
         const newReport = {
           date: new Date().toLocaleDateString(),
-          imageId: "img_" + Date.now().toString(), 
+          imageId: "img_" + Date.now().toString(),
           imageUrl: imageUrl || null,
           predictedLesionType: mlData.diagnosis, // Real diagnosis from ensemble!
           modelConfidence: `${(mlData.confidence * 100).toFixed(2)}%`, // Real confidence!
           // Add the Base64 image to the database so we can display it!
-          heatmapBase64: mlData.gradcam_image ? `data:image/jpeg;base64,${mlData.gradcam_image}` : null,
-          explanation: "Automated analysis completed using HAM10000 ensemble model. Please review the Grad-CAM heatmap for visual feature importance.",
+          heatmapBase64: mlData.gradcam_image
+            ? `data:image/jpeg;base64,${mlData.gradcam_image}`
+            : null,
+          explanation:
+            "Automated analysis completed using HAM10000 ensemble model. Please review the Grad-CAM heatmap for visual feature importance.",
         };
 
         // Save to Firestore Database securely
@@ -114,16 +117,19 @@ export default function StartDiagnosisPage() {
           ...newReport,
           createdAt: serverTimestamp(),
         });
-        
+
         console.log("Success: Real ML report saved to Firestore!");
 
         // Update UI
         setReportData({ ...newReport, reportId: docRef.id });
         setIsAnalyzing(false);
-      }catch (error: any) {
+      } catch (error: any) {
         console.error("Failed to process report:", error);
         // Show an actual error pop-up instead of hanging!
-        Alert.alert("Analysis Failed", "Could not complete the AI analysis. Please check your Python server terminal.");
+        Alert.alert(
+          "Analysis Failed",
+          "Could not complete the AI analysis. Please check your Python server terminal.",
+        );
         setIsAnalyzing(false);
         router.back(); // Kick them back to the previous screen
       }
@@ -170,7 +176,7 @@ export default function StartDiagnosisPage() {
             </Text>
           </View>
         ) : (
-         <ScrollView
+          <ScrollView
             style={styles.scrollContainer}
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
@@ -178,7 +184,8 @@ export default function StartDiagnosisPage() {
             {/* Report ID (Outside the Card) */}
             <View style={styles.reportIdSection}>
               <Text style={styles.reportIdText}>
-                Report ID: <Text style={styles.reportIdValue}>{reportData.reportId}</Text>
+                Report ID:{" "}
+                <Text style={styles.reportIdValue}>{reportData.reportId}</Text>
               </Text>
             </View>
 
@@ -186,22 +193,26 @@ export default function StartDiagnosisPage() {
             <View style={styles.mainCard}>
               {/* Meta Info */}
               <Text style={styles.metaText}>Date: {reportData.date}</Text>
-              <Text style={styles.metaText}>Image ID: {reportData.imageId}</Text>
+              <Text style={styles.metaText}>
+                Image ID: {reportData.imageId}
+              </Text>
 
               {/* Diagnosis Summary Header */}
-              <Text style={styles.sectionTitle}>
-                Diagnosis Summary
-              </Text>
+              <Text style={styles.sectionTitle}>Diagnosis Summary</Text>
 
               {/* Results */}
               <Text style={styles.infoText}>
                 Predicted lesion type:{" "}
-                <Text style={styles.infoValue}>{reportData.predictedLesionType}</Text>
+                <Text style={styles.infoValue}>
+                  {reportData.predictedLesionType}
+                </Text>
               </Text>
-              
+
               <Text style={styles.infoText}>
                 Model Confidence:{" "}
-                <Text style={styles.infoValue}>{reportData.modelConfidence}</Text>
+                <Text style={styles.infoValue}>
+                  {reportData.modelConfidence}
+                </Text>
               </Text>
 
               <Text style={styles.infoText}>
@@ -213,7 +224,9 @@ export default function StartDiagnosisPage() {
               <View style={styles.heatmapContainer}>
                 <Image
                   // Fallback to original image if heatmap fails to generate
-                  source={{ uri: reportData.heatmapBase64 || reportData.imageUrl }}
+                  source={{
+                    uri: reportData.heatmapBase64 || reportData.imageUrl,
+                  }}
                   style={styles.heatmapImage}
                   resizeMode="cover"
                 />
@@ -245,7 +258,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   headerSection: {
-    backgroundColor: "#3B9FE5",
+    backgroundColor: "#0a73ff",
     paddingVertical: 16,
     paddingHorizontal: 20,
     alignItems: "center",
@@ -293,12 +306,12 @@ const styles = StyleSheet.create({
     color: "#333333",
   },
   reportIdValue: {
-    color: "#3B9FE5",
+    color: "#0a73ff",
   },
   mainCard: {
     backgroundColor: "#FFFFFF",
     borderWidth: 1.5,
-    borderColor: "#3B9FE5",
+    borderColor: "#0a73ff",
     borderRadius: 12,
     padding: 16,
   },
@@ -310,14 +323,14 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#3B9FE5",
+    color: "#0a73ff",
     marginTop: 12,
     marginBottom: 12,
   },
   sectionTitleSmall: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#3B9FE5",
+    color: "#0a73ff",
     marginTop: 16,
     marginBottom: 8,
   },
@@ -328,7 +341,7 @@ const styles = StyleSheet.create({
   },
   infoValue: {
     fontWeight: "bold",
-    color: "#3B9FE5",
+    color: "#0a73ff",
   },
   heatmapContainer: {
     alignItems: "center",
@@ -343,7 +356,7 @@ const styles = StyleSheet.create({
   },
   explanationBox: {
     borderWidth: 1.5,
-    borderColor: "#3B9FE5",
+    borderColor: "#0a73ff",
     borderRadius: 8,
     padding: 16,
     backgroundColor: "#FFFFFF",

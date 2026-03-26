@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   headerSection: {
-    backgroundColor: "#3B9FE5",
+    backgroundColor: "#0a73ff",
     justifyContent: "center",
     alignItems: "center",
     borderBottomLeftRadius: 32,
@@ -322,13 +322,13 @@ const styles = StyleSheet.create({
     height: 18,
     marginRight: 8,
     borderWidth: 2,
-    borderColor: "#3B9FE5",
+    borderColor: "#0a73ff",
     borderRadius: 4,
     justifyContent: "center",
     alignItems: "center",
   },
   checkboxChecked: {
-    backgroundColor: "#3B9FE5",
+    backgroundColor: "#0a73ff",
   },
   checkboxMark: {
     color: "#FFFFFF",
@@ -346,14 +346,14 @@ const styles = StyleSheet.create({
   },
   forgotPassword: {
     fontSize: 14,
-    color: "#3B9FE5",
+    color: "#0a73ff",
     fontWeight: "600",
   },
   forgotPasswordSmall: {
     fontSize: 12,
   },
   loginButton: {
-    backgroundColor: "#3B9FE5",
+    backgroundColor: "#0a73ff",
     borderRadius: 16,
     paddingVertical: 16,
     paddingHorizontal: 40,
@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
   },
   signupLink: {
     fontSize: 14,
-    color: "#3B9FE5",
+    color: "#0a73ff",
     fontWeight: "700",
   },
   signupLinkSmall: {

@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   headerSection: {
-    backgroundColor: "#3B9FE5",
+    backgroundColor: "#0a73ff",
     justifyContent: "center",
     alignItems: "center",
     borderBottomLeftRadius: 32,
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   resetButton: {
-    backgroundColor: "#3B9FE5",
+    backgroundColor: "#0a73ff",
     borderRadius: 16,
     paddingVertical: 16,
     paddingHorizontal: 40,
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
   },
   backLink: {
     fontSize: 14,
-    color: "#3B9FE5",
+    color: "#0a73ff",
     fontWeight: "700",
   },
   backLinkSmall: {

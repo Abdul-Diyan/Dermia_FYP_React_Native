@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   headerSection: {
-    backgroundColor: "#3B9FE5",
+    backgroundColor: "#0a73ff",
     paddingVertical: 16,
     paddingHorizontal: 20,
     alignItems: "center",
@@ -399,14 +399,14 @@ const styles = StyleSheet.create({
   },
   imageItemSelected: {
     borderWidth: 4,
-    borderColor: "#3B9FE5",
+    borderColor: "#0a73ff",
   },
   imagePlaceholder: {
     borderRadius: 10,
     backgroundColor: "#E8B4B8",
   },
   addButton: {
-    backgroundColor: "#3B9FE5",
+    backgroundColor: "#0a73ff",
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   doneButton: {
-    backgroundColor: "#3B9FE5",
+    backgroundColor: "#0a73ff",
     borderRadius: 16,
     paddingVertical: 16,
     paddingHorizontal: 80,

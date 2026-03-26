@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   headerSection: {
-    backgroundColor: "#3B9FE5",
+    backgroundColor: "#0a73ff",
     paddingVertical: 16,
     paddingHorizontal: 20,
     alignItems: "center",
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
   reportCard: {
     backgroundColor: "#FFFFFF",
     borderWidth: 2,
-    borderColor: "#3B9FE5",
+    borderColor: "#0a73ff",
     borderRadius: 12,
     justifyContent: "flex-start",
     alignItems: "center",

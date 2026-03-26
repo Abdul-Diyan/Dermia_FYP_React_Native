@@ -111,18 +111,17 @@ const LandingPage = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    // Background color is now handled dynamically inline
   },
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF", // Keeps the main app background white so the image/text look right
+    backgroundColor: "#FFFFFF",
   },
   contentContainer: {
     flexGrow: 1,
     alignItems: "center",
   },
   headerSection: {
-    backgroundColor: "#3B9FE5",
+    backgroundColor: "#0a73ff",
     justifyContent: "center",
     alignItems: "center",
     borderBottomLeftRadius: 32,
@@ -183,7 +182,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   button: {
-    backgroundColor: "#3B9FE5",
+    backgroundColor: "#0a73ff",
     paddingVertical: 18,
     paddingHorizontal: 40,
     borderRadius: 24,

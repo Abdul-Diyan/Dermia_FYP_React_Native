@@ -26,13 +26,13 @@ export default function BottomTabNavigation({
   return (
     <View style={[styles.bottomNav, isSmallScreen && styles.bottomNavSmall]}>
       <Pressable style={styles.navItem} onPress={handleHistoryPress}>
-        <Text style={styles.navIcon}>📊</Text>
+        <Text style={styles.navIcon}>📋</Text>
       </Pressable>
       <Pressable style={styles.navItem} onPress={handleHomePress}>
         <Text style={styles.navIcon}>🏠</Text>
       </Pressable>
       <Pressable style={styles.navItem} onPress={handleProfilePress}>
-        <Text style={styles.navIcon}>👤</Text>
+        <Text style={styles.navIcon}>🧑</Text>
       </Pressable>
     </View>
   );
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "#3B9FE5",
+    backgroundColor: "#0a73ff",
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",

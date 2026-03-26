@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   headerSection: {
-    backgroundColor: "#3B9FE5",
+    backgroundColor: "#0a73ff",
     paddingVertical: 16,
     paddingHorizontal: 20,
     alignItems: "center",
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1,
-    marginBottom: 80, // Accounts for BottomTabNavigation
+    marginBottom: 80,
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: "#3B9FE5",
+    backgroundColor: "#0a73ff",
     justifyContent: "center",
     alignItems: "center",
     elevation: 3,
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#333333",
     borderWidth: 1,
-    borderColor: "#3B9FE5",
+    borderColor: "#0a73ff",
   },
   inputSmall: {
     paddingVertical: 8,

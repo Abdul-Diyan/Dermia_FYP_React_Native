@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8F8F8",
   },
   headerSection: {
-    backgroundColor: "#3B9FE5",
+    backgroundColor: "#0a73ff",
     paddingVertical: 24,
     paddingHorizontal: 20,
     alignItems: "center",
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#3B9FE5",
+    color: "#0a73ff",
     marginBottom: 16,
   },
   sectionTitleSmall: {
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: "#3B9FE5",
+    borderColor: "#0a73ff",
     padding: 20,
     alignItems: "center",
     marginBottom: 24, // Adds space between the cards
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
     width: 140,
     height: 120,
     borderWidth: 2,
-    borderColor: "#3B9FE5",
+    borderColor: "#0a73ff",
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
@@ -399,13 +399,13 @@ const styles = StyleSheet.create({
   viewAllLink: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#3B9FE5",
+    color: "#0a73ff",
   },
   viewAllLinkSmall: {
     fontSize: 13,
   },
   diagnosisButton: {
-    backgroundColor: "#3B9FE5",
+    backgroundColor: "#0a73ff",
     borderRadius: 16,
     paddingVertical: 18,
     paddingHorizontal: 60,

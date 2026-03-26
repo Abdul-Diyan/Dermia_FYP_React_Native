@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   headerSection: {
-    backgroundColor: "#3B9FE5",
+    backgroundColor: "#0a73ff",
     paddingVertical: 16,
     paddingHorizontal: 20,
     alignItems: "center",
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   },
   historySeverity: {
     fontSize: 14,
-    color: "#3B9FE5",
+    color: "#0a73ff",
     fontWeight: "600",
   },
   historySeveritySmall: {
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
   },
   arrowIcon: {
     fontSize: 20,
-    color: "#3B9FE5",
+    color: "#0a73ff",
     marginLeft: 12,
     fontWeight: "600",
   },
