@@ -16,6 +16,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../config/firebaseConfig";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function UserProfilePage() {
   const { width } = useWindowDimensions();
@@ -56,22 +57,27 @@ export default function UserProfilePage() {
         barStyle={topBarTextStyle}
       />
       <View style={styles.container}>
-        <View style={styles.headerSection}>
-          <Pressable style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backIcon}>←</Text>
-          </Pressable>
-          <Text
-            style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
-          >
-            Profile
-          </Text>
-          <Pressable
+        <LinearGradient
+                          colors={["#3b94ff", "#004dcc"]} // Light left, dark right
+                          start={{ x: 0, y: 0.5 }}
+                          end={{ x: 1, y: 0.5 }}
+                          style={styles.headerSection}
+                        >
+                            <Pressable style={styles.backButton} onPress={() => router.back()}>
+                    <Text style={styles.backIcon}>←</Text>
+                  </Pressable>
+                          <Text
+                            style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
+                          >
+                           Profile
+                          </Text>
+                          <Pressable
             style={styles.editButton}
             onPress={() => setIsEditing(!isEditing)}
           >
             <Text style={styles.editIcon}>{isEditing ? "✓" : "✏"}</Text>
           </Pressable>
-        </View>
+                </LinearGradient>
 
         <ScrollView
           style={styles.scrollContainer}

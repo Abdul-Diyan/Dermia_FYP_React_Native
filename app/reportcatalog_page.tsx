@@ -26,6 +26,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../config/firebaseConfig";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function ReportCatalogPage() {
   const { width, height } = useWindowDimensions();
@@ -145,26 +146,42 @@ export default function ReportCatalogPage() {
         barStyle={topBarTextStyle}
       />
       <View style={styles.container}>
-        <View style={styles.headerSection}>
-          <Pressable style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backIcon}>←</Text>
-          </Pressable>
+        
+        <LinearGradient
+         
+          colors={["#3b94ff", "#004dcc"]}  // Updated to app standard gradient
+          start={{ x: 0, y: 0.5 }}
+  end={{ x: 1, y: 0.5 }}
+          style={styles.headerSection}
+        >
+          {/* LEFT SIDE: 100px wide container to balance the right side */}
+          <View style={styles.headerSideContainer}>
+            <Pressable style={styles.backButton} onPress={() => router.back()}>
+              <Text style={styles.backIcon}>←</Text>
+            </Pressable>
+          </View>
+
+          {/* MIDDLE: Text perfectly centered */}
           <Text
             style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
           >
             Report History
           </Text>
-          <Pressable style={styles.clearButton} onPress={handleClearHistory}>
-            <Text
-              style={[
-                styles.clearButtonText,
-                isSmallScreen && styles.clearButtonTextSmall,
-              ]}
-            >
-              Clear History
-            </Text>
-          </Pressable>
-        </View>
+
+          {/* RIGHT SIDE: 100px wide container for the Clear button */}
+          <View style={[styles.headerSideContainer, { alignItems: 'flex-end' }]}>
+            <Pressable style={styles.clearButton} onPress={handleClearHistory}>
+              <Text
+                style={[
+                  styles.clearButtonText,
+                  isSmallScreen && styles.clearButtonTextSmall,
+                ]}
+              >
+                Clear History
+              </Text>
+            </Pressable>
+          </View>
+        </LinearGradient>
 
         <ScrollView
           style={styles.scrollContainer}
@@ -174,7 +191,7 @@ export default function ReportCatalogPage() {
           {isLoading ? (
             <ActivityIndicator
               size="large"
-              color="#3B9FE5"
+              color="#007BFF" // Updated loader color
               style={{ marginTop: 50 }}
             />
           ) : reports.length > 0 ? (
@@ -217,18 +234,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   headerSection: {
-    backgroundColor: "#0a73ff",
     paddingVertical: 16,
     paddingHorizontal: 20,
     alignItems: "center",
     justifyContent: "space-between",
     flexDirection: "row",
   },
+  headerSideContainer: {
+    width: 100, // Locks both sides to 100px so the middle is dead-center
+    justifyContent: 'center',
+  },
   backButton: {
     width: 50,
     height: 50,
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "flex-start", // Push icon to the left edge of the container
   },
   backIcon: {
     fontSize: 32,
@@ -247,13 +267,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   clearButton: {
-    width: 100,
-    alignItems: "flex-end",
+    paddingVertical: 10,
   },
   clearButtonText: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#FF4444",
+    fontWeight: "700", // Made slightly bolder
+    color: "#FF8888", // Lightened red so it passes contrast checks on blue
   },
   clearButtonTextSmall: {
     fontSize: 12,
@@ -278,7 +297,7 @@ const styles = StyleSheet.create({
   reportCard: {
     backgroundColor: "#FFFFFF",
     borderWidth: 2,
-    borderColor: "#0a73ff",
+    borderColor: "#007BFF", // Match unified app blue
     borderRadius: 12,
     justifyContent: "flex-start",
     alignItems: "center",

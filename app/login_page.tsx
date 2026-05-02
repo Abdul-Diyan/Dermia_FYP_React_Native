@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     flexGrow: 1,
     alignItems: "center",
-    paddingBottom: 40,
+    paddingBottom: 12,
   },
   headerSection: {
     justifyContent: "center",
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#FFFFFF",
     letterSpacing: 0.3,
-    marginTop: 12, 
+    marginTop: 40, 
   },
     headerSubtitleTextSmall: {
     fontSize: 16,
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   formContainer: {
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
-    marginTop: -80, // Pulls the white card up over the blue background
+    marginTop: -130, // Pulls the white card up over the blue background
     paddingHorizontal: 24,
     paddingVertical: 32,
     elevation: 4,

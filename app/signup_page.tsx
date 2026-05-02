@@ -3,6 +3,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import {
   Alert,
+  Platform,
   Pressable,
   ScrollView,
   StatusBar,
@@ -15,6 +16,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../config/firebaseConfig";
+import { LinearGradient } from "expo-linear-gradient"; // Use LinearGradient as requested
 
 export default function SignupPage() {
   const { width, height } = useWindowDimensions();
@@ -68,30 +70,33 @@ export default function SignupPage() {
         bounces={false}
         showsHorizontalScrollIndicator={false}
       >
-        <View style={[styles.headerSection, { minHeight: height * 0.25 }]}>
+        <LinearGradient
+          colors={["#4DA1FF", "#0066FF"]} // Match the gradient in image_3.png
+          style={[styles.headerSection, { minHeight: height * 0.48 }]} // Elongated to match forgot password page length
+        >
           <Text
             style={[styles.titleText, isSmallScreen && styles.titleTextSmall]}
           >
             Sign up
           </Text>
-        </View>
+          
+          {/* Moved the 'Create new Account' text out of the card and made it white */}
+          <Text
+            style={[styles.headerSubtitleText, isSmallScreen && styles.headerSubtitleTextSmall]}
+          >
+            Create a new Account
+          </Text>
+        </LinearGradient>
 
         <View
           style={[
             styles.formContainer,
             isSmallScreen && styles.formContainerSmall,
-            { width: isSmallScreen ? width * 0.9 : width * 0.85 }, // Ensures form stays centered and responsive
+            { width: isSmallScreen ? width * 0.9 : width * 0.85 }, // Center and responsive width
           ]}
         >
-          <Text
-            style={[
-              styles.subtitleText,
-              isSmallScreen && styles.subtitleTextSmall,
-            ]}
-          >
-            Create a new Account
-          </Text>
-
+          {/* Removed internal 'Create a new Account' text from here */}
+          
           <View style={styles.inputGroup}>
             <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
               Email
@@ -127,7 +132,7 @@ export default function SignupPage() {
             </Text>
             <TextInput
               style={[styles.input, isSmallScreen && styles.inputSmall]}
-              placeholder="••••••••••••••••"
+              placeholder="••••••••••••••••" // Match image with bullets
               placeholderTextColor="#999"
               secureTextEntry
               value={password}
@@ -141,13 +146,15 @@ export default function SignupPage() {
             </Text>
             <TextInput
               style={[styles.input, isSmallScreen && styles.inputSmall]}
-              placeholder="••••••••••••••••"
+              placeholder="••••••••••••••••" // Match image with bullets
               placeholderTextColor="#999"
               secureTextEntry
               value={confirmPassword}
               onChangeText={setConfirmPassword}
             />
           </View>
+          
+          {/* Note: Internal 'Forgot password?' is ignored as per instructions */}
 
           <View style={{ marginTop: 12 }}>
             <Pressable
@@ -198,7 +205,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#F8F9FA", // Use a light gray to match the shadow depth in image_3.png
   },
   contentContainer: {
     flexGrow: 1,
@@ -206,30 +213,46 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   headerSection: {
-    backgroundColor: "#0a73ff",
+    // Gradient is applied directly via LinearGradient
     justifyContent: "center",
     alignItems: "center",
     borderBottomLeftRadius: 32,
     borderBottomRightRadius: 32,
-    paddingBottom: 40,
+    paddingBottom: 80, // Allow space for the subtitle above the card
     width: "100%",
     overflow: "hidden",
   },
   titleText: {
-    fontSize: 64,
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
+    fontSize: 56, // Match target image size
     fontWeight: "700",
     color: "#FFFFFF",
     letterSpacing: 1,
+    marginBottom: 24, // Space between title and subtitle
+    textAlign: "center",
   },
   titleTextSmall: {
     fontSize: 48,
+    marginBottom: 16,
+  },
+  headerSubtitleText: {
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
+    fontSize: 22, // Match target image size
+    fontWeight: "600",
+    color: "#FFFFFF", // White text above the card
+    letterSpacing: 0.5,
+    textAlign: "center",
+  },
+  headerSubtitleTextSmall: {
+    fontSize: 18,
   },
   formContainer: {
     backgroundColor: "#FFFFFF",
     borderRadius: 24,
-    marginTop: -40,
+    marginTop: -130, // Deeper overlap to match elongated header
     paddingHorizontal: 24,
-    paddingVertical: 32,
+    paddingVertical: 36, // Match shadow depth and padding in image_3.png
+    minHeight: 380, // Provide ample space for inputs
     elevation: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
@@ -238,26 +261,17 @@ const styles = StyleSheet.create({
   },
   formContainerSmall: {
     paddingHorizontal: 16,
-    paddingVertical: 24,
-  },
-  subtitleText: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#333333",
-    marginBottom: 24,
-    textAlign: "center",
-  },
-  subtitleTextSmall: {
-    fontSize: 16,
-    marginBottom: 16,
+    paddingVertical: 28,
+    minHeight: 340,
   },
   inputGroup: {
     marginBottom: 20,
   },
   label: {
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
     fontSize: 14,
-    fontWeight: "500",
-    color: "#666666",
+    fontWeight: "600",
+    color: "#555555",
     marginBottom: 8,
   },
   labelSmall: {
@@ -265,52 +279,42 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   input: {
-    backgroundColor: "#F5F5F5",
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
+    backgroundColor: "#F7F7F7", // Match the lighter grey input background
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    fontSize: 14,
+    fontSize: 15,
     color: "#333333",
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
+    borderWidth: 0, // Borderless inputs like target image
+    fontWeight: "500",
   },
   inputSmall: {
     paddingVertical: 12,
     paddingHorizontal: 12,
     fontSize: 12,
   },
-  forgotPasswordContainer: {
-    alignItems: "center",
-    marginBottom: 28,
-    marginTop: 8,
-  },
-  forgotPassword: {
-    fontSize: 14,
-    color: "#0a73ff",
-    fontWeight: "600",
-  },
-  forgotPasswordSmall: {
-    fontSize: 12,
-  },
   signupButton: {
-    backgroundColor: "#0a73ff",
+    backgroundColor: "#007BFF", // Match exact button blue
     borderRadius: 16,
     paddingVertical: 16,
-    paddingHorizontal: 40,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
-    elevation: 3,
+    marginTop: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    elevation: 3,
   },
   signupButtonSmall: {
     paddingVertical: 13,
     marginBottom: 16,
+    marginTop: 8,
   },
   signupButtonText: {
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
     fontSize: 18,
     fontWeight: "700",
     color: "#FFFFFF",
@@ -325,15 +329,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   loginText: {
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
     fontSize: 14,
     color: "#333333",
+    fontWeight: "500",
   },
   loginTextSmall: {
     fontSize: 12,
   },
   loginLink: {
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
     fontSize: 14,
-    color: "#0a73ff",
+    color: "#007BFF", // Match blue link color
     fontWeight: "700",
   },
   loginLinkSmall: {

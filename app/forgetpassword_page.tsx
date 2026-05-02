@@ -3,6 +3,7 @@ import { sendPasswordResetEmail } from "firebase/auth";
 import React, { useState } from "react";
 import {
   Alert,
+  Platform,
   Pressable,
   ScrollView,
   StatusBar,
@@ -15,6 +16,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../config/firebaseConfig";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function ForgetPasswordPage() {
   const { width, height } = useWindowDimensions();
@@ -72,39 +74,29 @@ export default function ForgetPasswordPage() {
         bounces={false}
         showsHorizontalScrollIndicator={false}
       >
-        <View style={[styles.headerSection, { minHeight: height * 0.35 }]}>
-          <Text
-            style={[styles.titleText, isSmallScreen && styles.titleTextSmall]}
-          >
-            Reset Password
-          </Text>
-          <View style={styles.subtitleContainer}>
+        <LinearGradient
+          colors={["#4E9BFF", "#2B82FF"]}
+          style={[styles.headerSection, { minHeight: height * 0.48 }]} 
+        >
+          <View style={styles.textContainer}>
             <Text
-              style={[
-                styles.subtitleText,
-                isSmallScreen && styles.subtitleTextSmall,
-              ]}
+              style={[styles.titleText, isSmallScreen && styles.titleTextSmall]}
             >
-              Forgot password ?
+              Reset Password
             </Text>
+            
             <Text
               style={[
                 styles.subtitleText,
                 isSmallScreen && styles.subtitleTextSmall,
               ]}
             >
-              We got you
-            </Text>
-            <Text
-              style={[
-                styles.subtitleText,
-                isSmallScreen && styles.subtitleTextSmall,
-              ]}
-            >
+              Forgot password ?{"\n"}
+              We got you{"\n"}
               covered.
             </Text>
           </View>
-        </View>
+        </LinearGradient>
 
         <View
           style={[
@@ -145,21 +137,6 @@ export default function ForgetPasswordPage() {
               Reset Password
             </Text>
           </Pressable>
-
-          <View style={styles.backToLoginContainer}>
-            <Text
-              style={[styles.backText, isSmallScreen && styles.backTextSmall]}
-            >
-              Remember password?{" "}
-            </Text>
-            <Pressable onPress={() => router.push("/login_page")}>
-              <Text
-                style={[styles.backLink, isSmallScreen && styles.backLinkSmall]}
-              >
-                Login
-              </Text>
-            </Pressable>
-          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -172,7 +149,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#F8F9FA",
   },
   contentContainer: {
     flexGrow: 1,
@@ -180,62 +157,71 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   headerSection: {
-    backgroundColor: "#0a73ff",
     justifyContent: "center",
     alignItems: "center",
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
-    paddingBottom: 40,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    paddingBottom: 80, 
     width: "100%",
     overflow: "hidden",
   },
+  textContainer: {
+    alignItems: "center", // This centers the text block as a whole
+    paddingHorizontal: 20,
+  },
   titleText: {
-    fontSize: 64,
-    fontWeight: "700",
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System', 
+    fontSize: 40,
+    fontWeight: "bold",
     color: "#FFFFFF",
-    letterSpacing: 1,
-    marginBottom: 20,
+    letterSpacing: 0.5,
+    marginBottom: 24,
     textAlign: "center",
   },
   titleTextSmall: {
-    fontSize: 48,
+    fontSize: 34,
     marginBottom: 16,
   },
-  subtitleContainer: {
-    alignItems: "center",
-  },
   subtitleText: {
-    fontSize: 24,
-    fontWeight: "600",
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
+    fontSize: 20, 
+    fontWeight: "600", 
     color: "#FFFFFF",
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
+    lineHeight: 28, 
+    textAlign: "left", // This left-aligns the text inside its centered block
   },
   subtitleTextSmall: {
     fontSize: 18,
+    lineHeight: 26,
   },
   formContainer: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    marginTop: -40,
+    borderRadius: 16,
+    marginTop: -130,
     paddingHorizontal: 24,
-    paddingVertical: 32,
-    elevation: 8,
+    paddingVertical: 36, 
+    minHeight: 300, 
+    elevation: 4,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
   },
   formContainerSmall: {
     paddingHorizontal: 16,
-    paddingVertical: 24,
+    paddingVertical: 28,
+    marginTop: -60,
+    minHeight: 260,
   },
   inputGroup: {
-    marginBottom: 20,
+    marginBottom: 32, 
   },
   label: {
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
     fontSize: 14,
-    fontWeight: "500",
-    color: "#666666",
+    fontWeight: "600",
+    color: "#555555",
     marginBottom: 8,
   },
   labelSmall: {
@@ -243,67 +229,37 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   input: {
-    backgroundColor: "#F5F5F5",
-    borderRadius: 12,
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
+    backgroundColor: "#F7F7F7",
+    borderRadius: 8,
     paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 14,
+    paddingVertical: 16, 
+    fontSize: 15,
     color: "#333333",
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
+    fontWeight: "500",
   },
   inputSmall: {
     paddingVertical: 12,
     paddingHorizontal: 12,
-    fontSize: 12,
+    fontSize: 14,
   },
   resetButton: {
-    backgroundColor: "#0a73ff",
-    borderRadius: 16,
+    backgroundColor: "#007BFF",
+    borderRadius: 12,
     paddingVertical: 16,
-    paddingHorizontal: 40,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
-    marginTop: 20,
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
   resetButtonSmall: {
-    paddingVertical: 13,
-    marginBottom: 16,
-    marginTop: 16,
+    paddingVertical: 14,
   },
   resetButtonText: {
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: "600",
     color: "#FFFFFF",
-    letterSpacing: 0.5,
   },
   resetButtonTextSmall: {
-    fontSize: 15,
-  },
-  backToLoginContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  backText: {
-    fontSize: 14,
-    color: "#333333",
-  },
-  backTextSmall: {
-    fontSize: 12,
-  },
-  backLink: {
-    fontSize: 14,
-    color: "#0a73ff",
-    fontWeight: "700",
-  },
-  backLinkSmall: {
-    fontSize: 12,
+    fontSize: 16,
   },
 });

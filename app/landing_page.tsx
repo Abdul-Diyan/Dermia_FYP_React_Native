@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import React from "react";
 import {
   Image,
+  Platform, // Added for consistent font rendering if needed
   Pressable,
   ScrollView,
   StatusBar,
@@ -12,6 +13,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient"; // Import LinearGradient
 
 const LandingPage = () => {
   const { width, height } = useWindowDimensions();
@@ -37,7 +39,9 @@ const LandingPage = () => {
         bounces={false}
         showsHorizontalScrollIndicator={false}
       >
-        <View
+        {/* Replaced View with LinearGradient */}
+        <LinearGradient
+          colors={["#4DA1FF", "#0066FF"]} // The same gradient colors used previously
           style={[
             styles.headerSection,
             {
@@ -51,7 +55,7 @@ const LandingPage = () => {
           >
             Dermia
           </Text>
-        </View>
+        </LinearGradient>
 
         <View style={styles.bodySection}>
           <View style={[styles.illustrationSection, { height: height * 0.3 }]}>
@@ -118,7 +122,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerSection: {
-    backgroundColor: "#0a73ff",
+    // backgroundColor: "#0a73ff", <-- Removed as LinearGradient handles this now
     justifyContent: "center",
     alignItems: "center",
     borderBottomLeftRadius: 32,
@@ -127,6 +131,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   titleText: {
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
     fontSize: 72,
     fontWeight: "700",
     color: "#FFFFFF",
@@ -154,6 +159,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   mainText: {
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
     fontSize: 36,
     fontWeight: "700",
     color: "#000000",
@@ -164,6 +170,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
   },
   subText: {
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
     fontSize: 36,
     fontWeight: "700",
     color: "#000000",
@@ -179,7 +186,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   button: {
-    backgroundColor: "#0a73ff",
+    backgroundColor: "#007BFF", // Matched the blue from the previous pages
     paddingVertical: 18,
     paddingHorizontal: 40,
     borderRadius: 24,
@@ -198,6 +205,7 @@ const styles = StyleSheet.create({
     minWidth: 220,
   },
   buttonText: {
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
     fontSize: 28,
     fontWeight: "700",
     color: "#FFFFFF",

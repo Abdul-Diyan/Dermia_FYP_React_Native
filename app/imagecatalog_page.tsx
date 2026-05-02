@@ -28,6 +28,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../config/firebaseConfig";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function ImageCatalogPage() {
   const { width, height } = useWindowDimensions();
@@ -234,17 +235,24 @@ export default function ImageCatalogPage() {
         barStyle={topBarTextStyle}
       />
       <View style={styles.container}>
-        <View style={styles.headerSection}>
-          <Pressable style={styles.backButton} onPress={() => router.back()}>
+    
+
+        <LinearGradient
+                  colors={["#3b94ff", "#004dcc"]} // Light left, dark right
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }}
+                  style={styles.headerSection}
+                >
+                    <Pressable style={styles.backButton} onPress={() => router.back()}>
             <Text style={styles.backIcon}>←</Text>
           </Pressable>
-          <Text
-            style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
-          >
-            {mode === "manage" ? "Image Catalog" : "Select Image"}
-          </Text>
-          <View style={{ width: 50 }} />
-        </View>
+                  <Text
+                    style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
+                  >
+                    {mode === "manage" ? "Image Catalog" : "Select Image"}
+                  </Text>
+                  <View style={{ width: 50 }} />
+        </LinearGradient>
 
         <ScrollView
           style={styles.scrollContainer}
