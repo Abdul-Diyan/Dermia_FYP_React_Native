@@ -17,6 +17,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../config/firebaseConfig";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function DashboardPage() {
   const { width, height } = useWindowDimensions();
@@ -85,148 +86,99 @@ export default function DashboardPage() {
       />
       <View style={styles.container}>
         {/* Header Section */}
-        <View style={styles.headerSection}>
+        <LinearGradient
+          colors={["#3b94ff", "#004dcc"]} // Light left, dark right
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
+          style={styles.headerSection}
+        >
           <Text
             style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
           >
             Welcome Back !
           </Text>
-        </View>
+        </LinearGradient>
 
         <ScrollView
           style={styles.scrollContainer}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <View
-            style={[
-              styles.cardContainer,
-              isSmallScreen && styles.cardContainerSmall,
-            ]}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#3B9FE5" />
-            ) : (
-              <View style={styles.imageGridRow}>
-                {recentImages.length > 0 ? (
+          {/* Browse Images Section */}
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitleHeader}>Browse Images</Text>
+            <View style={[styles.cardContainer, isSmallScreen && styles.cardContainerSmall]}>
+              <View style={styles.cardContentRow}>
+                {isLoading ? (
+                  <ActivityIndicator color="#007BFF" />
+                ) : recentImages.length > 0 ? (
                   recentImages.map((img) => (
                     <Image
                       key={img.id}
                       source={{ uri: img.url }}
-                      style={[
-                        styles.liveThumbnail,
-                        isSmallScreen && styles.liveThumbnailSmall,
-                      ]}
+                      style={[styles.liveThumbnail, isSmallScreen && styles.liveThumbnailSmall]}
                     />
                   ))
                 ) : (
                   <Pressable
-                    style={[
-                      styles.emptyPlaceholderCard,
-                      isSmallScreen && styles.emptyPlaceholderCardSmall,
-                    ]}
-                    onPress={() =>
-                      router.push({
-                        pathname: "/imagecatalog_page",
-                        params: { mode: "upload" },
-                      })
-                    }
+                    style={[styles.emptyPlaceholderCard, isSmallScreen && styles.emptyPlaceholderCardSmall]}
+                    onPress={() => router.push({ pathname: "/imagecatalog_page", params: { mode: "upload" } })}
                   >
                     <Text style={styles.emptyIcon}>📷</Text>
                     <Text style={styles.emptyPromptText}>Add Photo</Text>
                   </Pressable>
                 )}
               </View>
-            )}
 
-            <Pressable
-              onPress={() =>
-                router.push({
-                  pathname: "/imagecatalog_page",
-                  params: { mode: "manage" },
-                })
-              }
-            >
-              <Text
-                style={[
-                  styles.viewAllLink,
-                  isSmallScreen && styles.viewAllLinkSmall,
-                ]}
-              >
-                View all
-              </Text>
-            </Pressable>
+              <View style={styles.viewAllContainer}>
+                <Pressable onPress={() => router.push({ pathname: "/imagecatalog_page", params: { mode: "manage" } })}>
+                  <Text style={[styles.viewAllLink, isSmallScreen && styles.viewAllLinkSmall]}>
+                    View all
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
           </View>
 
-          <View
-            style={[
-              styles.cardContainer,
-              isSmallScreen && styles.cardContainerSmall,
-            ]}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#3B9FE5" />
-            ) : (
-              <View style={styles.reportsWrapper}>
-                {recentReports.length > 0 ? (
+          {/* Previous Report History Section */}
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitleHeader}>Previous report history</Text>
+            <View style={[styles.cardContainer, isSmallScreen && styles.cardContainerSmall]}>
+              <View style={styles.cardContentRow}>
+                {isLoading ? (
+                  <ActivityIndicator color="#007BFF" />
+                ) : recentReports.length > 0 ? (
                   recentReports.map((report) => (
                     <Pressable
                       key={report.id}
-                      style={[
-                        styles.reportCard,
-                        isSmallScreen && styles.reportCardSmall,
-                      ]}
-                      onPress={() =>
-                        router.push({
-                          pathname: "/startdiagnosis_page",
-                          params: { imageUrl: report.imageUrl },
-                        })
-                      }
+                      style={[styles.reportCard, isSmallScreen && styles.reportCardSmall]}
+                      onPress={() => router.push({ pathname: "/startdiagnosis_page", params: { imageUrl: report.imageUrl } })}
                     >
-                      <Text
-                        style={[
-                          styles.reportText,
-                          isSmallScreen && styles.reportTextSmall,
-                        ]}
-                        numberOfLines={1}
-                      >
-                        {report.predictedLesionType || "Report"}
-                      </Text>
-                      <Text style={styles.reportConfidenceText}>
-                        {report.modelConfidence
-                          ? `Conf: ${report.modelConfidence}`
-                          : "View Details"}
+                      <Text style={[styles.reportText, isSmallScreen && styles.reportTextSmall]} numberOfLines={1}>
+                        {report.predictedLesionType || "Sample Report"}
                       </Text>
                     </Pressable>
                   ))
                 ) : (
-                  <Pressable
-                    style={[
-                      styles.emptyPlaceholderCard,
-                      styles.emptyReportCard,
-                      isSmallScreen && styles.reportCardSmall,
-                    ]}
-                  >
+                  <Pressable style={[styles.emptyPlaceholderCard, styles.emptyReportCard, isSmallScreen && styles.reportCardSmall]}>
                     <Text style={styles.emptyIcon}>🔬</Text>
-                    <Text style={styles.emptyPromptText}>No Scans Yet</Text>
+                    <Text style={styles.emptyPromptText}>No Scans</Text>
                   </Pressable>
                 )}
               </View>
-            )}
 
-            <Pressable onPress={() => router.push("/reportcatalog_page")}>
-              <Text
-                style={[
-                  styles.viewAllLink,
-                  isSmallScreen && styles.viewAllLinkSmall,
-                ]}
-              >
-                View all
-              </Text>
-            </Pressable>
+              <View style={styles.viewAllContainer}>
+                <Pressable onPress={() => router.push("/reportcatalog_page")}>
+                  <Text style={[styles.viewAllLink, isSmallScreen && styles.viewAllLinkSmall]}>
+                    View all
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
           </View>
 
-          <View style={styles.section}>
+          {/* Start Diagnosis Button Section */}
+          <View style={styles.diagnosisSectionWrapper}>
             <Pressable
               style={({ pressed }) => [
                 styles.diagnosisButton,
@@ -239,32 +191,13 @@ export default function DashboardPage() {
                   "How would you like to provide the image?",
                   [
                     { text: "Cancel", style: "cancel" },
-                    {
-                      text: "Previous Scan",
-                      onPress: () =>
-                        router.push({
-                          pathname: "/imagecatalog_page",
-                          params: { mode: "select" },
-                        }),
-                    },
-                    {
-                      text: "Upload New Photo",
-                      onPress: () =>
-                        router.push({
-                          pathname: "/imagecatalog_page",
-                          params: { mode: "upload" },
-                        }),
-                    },
-                  ],
+                    { text: "Previous Scan", onPress: () => router.push({ pathname: "/imagecatalog_page", params: { mode: "select" } }) },
+                    { text: "Upload New Photo", onPress: () => router.push({ pathname: "/imagecatalog_page", params: { mode: "upload" } }) },
+                  ]
                 );
               }}
             >
-              <Text
-                style={[
-                  styles.diagnosisButtonText,
-                  isSmallScreen && styles.diagnosisButtonTextSmall,
-                ]}
-              >
+              <Text style={[styles.diagnosisButtonText, isSmallScreen && styles.diagnosisButtonTextSmall]}>
                 Start Diagnosis
               </Text>
             </Pressable>
@@ -283,194 +216,154 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "#F8F8F8",
+    backgroundColor: "#FFFFFF", // Changed to pure white to match screenshot
   },
   headerSection: {
-    backgroundColor: "#0a73ff",
     paddingVertical: 24,
     paddingHorizontal: 20,
     alignItems: "center",
+    // Background color removed as it's now handled by LinearGradient
   },
   headerText: {
-    fontSize: 32,
-    fontWeight: "700",
+    fontSize: 22, // Adjusted size to match SS
+    fontWeight: "600",
     color: "#FFFFFF",
     letterSpacing: 0.5,
   },
   headerTextSmall: {
-    fontSize: 24,
+    fontSize: 18,
   },
   scrollContainer: {
     flex: 1,
   },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingVertical: 24,
+    paddingVertical: 30, // Pushes content down a bit from header
     paddingBottom: 100,
   },
-  section: {
-    marginTop: 32,
-    alignItems: "center",
+  sectionContainer: {
+    marginBottom: 40, // Perfects the gap between Catalog and Reports
   },
-  sectionSmall: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#0a73ff",
-    marginBottom: 16,
-  },
-  sectionTitleSmall: {
+  sectionTitleHeader: {
     fontSize: 16,
-    marginBottom: 12,
+    fontWeight: "700",
+    color: "#0066FF", // Exact blue from the screenshot text
+    marginBottom: 8,
   },
   cardContainer: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: "#0a73ff",
-    padding: 20,
-    alignItems: "center",
-    marginBottom: 24,
+    backgroundColor: "#F8FAFD", // Very faint blue/gray background
+    borderRadius: 8, // Less rounded, matches SS
+    borderWidth: 1, // Thinner border
+    borderColor: "#A3C8FA", // Light blue border
+    padding: 16,
+    minHeight: 130, // Ensures room for 'View all' at bottom
+    justifyContent: "space-between", // Pushes content top, 'View all' bottom
   },
   cardContainerSmall: {
-    padding: 16,
+    padding: 12,
+    minHeight: 110,
   },
-  imageWrapper: {
-    width: "100%",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  imagePlaceholder: {
-    width: 140,
-    height: 120,
-    backgroundColor: "#E8B4B8",
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "#8B6B6F",
-  },
-  imagePlaceholderSmall: {
-    width: 100,
-    height: 90,
-  },
-  reportsWrapper: {
+  cardContentRow: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "flex-start", // Aligns images/reports to the left
+    gap: 12,
     width: "100%",
-    marginBottom: 16,
   },
-  reportCard: {
-    width: 140,
-    height: 120,
-    borderWidth: 2,
-    borderColor: "#0a73ff",
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F0F8FF",
-  },
-  reportCardSmall: {
-    width: 100,
-    height: 90,
-  },
-  reportText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333333",
-    textAlign: "center",
-    lineHeight: 24,
-  },
-  reportTextSmall: {
-    fontSize: 13,
-    lineHeight: 18,
+  viewAllContainer: {
+    alignItems: "flex-end", // Aligns "View all" to bottom right
+    marginTop: 10,
   },
   viewAllLink: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#0a73ff",
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#4FA0FF", // Lighter blue for the link text
   },
   viewAllLinkSmall: {
     fontSize: 13,
   },
+  diagnosisSectionWrapper: {
+    marginTop: 100, // Increased significantly to push the button lower
+    alignItems: "center", 
+  },
   diagnosisButton: {
-    backgroundColor: "#0a73ff",
-    borderRadius: 16,
-    paddingVertical: 18,
-    paddingHorizontal: 60,
+    backgroundColor: "#007BFF", 
+    borderRadius: 8, 
+    paddingVertical: 14, // Slightly thinner vertically
     alignItems: "center",
     justifyContent: "center",
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    width: "100%", // Helps it stretch naturally
+    width: 200, // Reduced width to match the screenshot proportions
   },
   diagnosisButtonSmall: {
-    paddingVertical: 15,
-    paddingHorizontal: 40,
+    paddingVertical: 14,
+    width: 180,
   },
   diagnosisButtonText: {
     fontSize: 18,
     fontWeight: "700",
     color: "#FFFFFF",
-    letterSpacing: 0.5,
   },
   diagnosisButtonTextSmall: {
     fontSize: 15,
   },
-  imageGridRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 12,
-    width: "100%",
-    marginBottom: 16,
-  },
   liveThumbnail: {
-    width: 80,
-    height: 80,
-    borderRadius: 12,
+    width: 100, // Slightly wider thumbnail to match SS
+    height: 70,
+    borderRadius: 4, // Less rounded thumbnail
     borderWidth: 1,
-    borderColor: "#E0E0E0",
+    borderColor: "#007BFF", // Adding blue border around image
   },
   liveThumbnailSmall: {
-    width: 65,
-    height: 65,
+    width: 80,
+    height: 60,
   },
-  reportConfidenceText: {
-    fontSize: 12,
-    color: "#666",
-    marginTop: 4,
+  reportCard: {
+    width: 100, // Matches SS proportion
+    height: 80,
+    borderWidth: 1,
+    borderColor: "#4FA0FF",
+    borderRadius: 4,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF", // White interior for report cards
+  },
+  reportCardSmall: {
+    width: 85,
+    height: 70,
+  },
+  reportText: {
+    fontSize: 14,
     fontWeight: "500",
+    color: "#555", // Dark grey text inside report card
+    textAlign: "center",
+  },
+  reportTextSmall: {
+    fontSize: 12,
   },
   emptyPlaceholderCard: {
     width: 100,
-    height: 100,
-    borderWidth: 2,
+    height: 70,
+    borderWidth: 1,
     borderColor: "#CCC",
     borderStyle: "dashed",
-    borderRadius: 12,
+    borderRadius: 4,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#FAFAFA",
   },
   emptyPlaceholderCardSmall: {
     width: 80,
-    height: 80,
+    height: 60,
   },
   emptyReportCard: {
-    width: 140,
-    height: 120,
+    width: 100,
+    height: 80,
   },
   emptyIcon: {
-    fontSize: 28,
-    marginBottom: 4,
+    fontSize: 20,
+    marginBottom: 2,
   },
   emptyPromptText: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: 11,
     color: "#999",
-    textAlign: "center",
   },
 });

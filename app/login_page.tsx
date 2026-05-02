@@ -16,6 +16,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../config/firebaseConfig";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function LoginPage() {
   const { width, height } = useWindowDimensions();
@@ -77,30 +78,26 @@ export default function LoginPage() {
         bounces={false}
         showsHorizontalScrollIndicator={false}
       >
-        <View style={[styles.headerSection, { minHeight: height * 0.25 }]}>
-          <Text
-            style={[styles.titleText, isSmallScreen && styles.titleTextSmall]}
-          >
+        {/* Header Section */}
+        <LinearGradient
+          colors={["#54A3FF", "#0066FF"]} // Vertical gradient matching the screenshot
+          style={[styles.headerSection, { minHeight: height * 0.42 }]} // Extended background
+        >
+          <Text style={[styles.titleText, isSmallScreen && styles.titleTextSmall]}>
             Login
           </Text>
-        </View>
+          <Text style={[styles.headerSubtitleText, isSmallScreen && styles.headerSubtitleTextSmall]}>
+            Login to existing Account
+          </Text>
+        </LinearGradient>
 
         <View
           style={[
             styles.formContainer,
             isSmallScreen && styles.formContainerSmall,
-            { width: isSmallScreen ? width * 0.9 : width * 0.85 }, // Ensures form stays centered and responsive
+            { width: isSmallScreen ? width * 0.9 : width * 0.85 }, 
           ]}
         >
-          <Text
-            style={[
-              styles.subtitleText,
-              isSmallScreen && styles.subtitleTextSmall,
-            ]}
-          >
-            Login to existing Account
-          </Text>
-
           <View style={styles.inputGroup}>
             <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
               Email or username
@@ -130,6 +127,8 @@ export default function LoginPage() {
             />
           </View>
 
+          {/* Options Container (Remember Me Removed, Forgot Password Centered) */}
+          {/* Options Container (Remember Me & Forgot Password) */}
           <View style={styles.optionsContainer}>
             <Pressable
               style={styles.rememberMeContainer}
@@ -149,6 +148,7 @@ export default function LoginPage() {
                 remember me
               </Text>
             </Pressable>
+
             <Pressable onPress={() => router.push("/forgetpassword_page")}>
               <Text
                 style={[
@@ -186,7 +186,7 @@ export default function LoginPage() {
                 isSmallScreen && styles.signupTextSmall,
               ]}
             >
-              Don't have an account?{" "}
+              Don't have an account ?{" "}
             </Text>
             <Pressable onPress={() => router.push("/signup_page")}>
               <Text
@@ -204,14 +204,13 @@ export default function LoginPage() {
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#F8F9FA", // Light grey background behind the card
   },
   contentContainer: {
     flexGrow: 1,
@@ -219,58 +218,60 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   headerSection: {
-    backgroundColor: "#0a73ff",
     justifyContent: "center",
     alignItems: "center",
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
-    paddingBottom: 40,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    paddingBottom: 60, // Pushes text up slightly from the card
     width: "100%",
     overflow: "hidden",
   },
   titleText: {
-    fontSize: 64,
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System', // Forces standard font
+    fontSize: 48,
     fontWeight: "700",
     color: "#FFFFFF",
-    letterSpacing: 1,
+    letterSpacing: 0.5,
+    marginBottom: 16, 
   },
   titleTextSmall: {
-    fontSize: 48,
+    fontSize: 40,
+  },
+  headerSubtitleText: {
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System', 
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#FFFFFF",
+    letterSpacing: 0.3,
+    marginTop: 12, 
+  },
+    headerSubtitleTextSmall: {
+    fontSize: 16,
   },
   formContainer: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    marginTop: -40,
+    borderRadius: 16,
+    marginTop: -80, // Pulls the white card up over the blue background
     paddingHorizontal: 24,
     paddingVertical: 32,
-    elevation: 8,
+    elevation: 4,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
   },
   formContainerSmall: {
     paddingHorizontal: 16,
     paddingVertical: 24,
-  },
-  subtitleText: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#333333",
-    marginBottom: 24,
-    textAlign: "center",
-  },
-  subtitleTextSmall: {
-    fontSize: 16,
-    marginBottom: 16,
+    marginTop: -60,
   },
   inputGroup: {
     marginBottom: 20,
   },
   label: {
     fontSize: 14,
-    fontWeight: "500",
-    color: "#666666",
+    fontWeight: "600", // Matches the bold label in SS
+    color: "#555555",
     marginBottom: 8,
   },
   labelSmall: {
@@ -278,14 +279,14 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   input: {
-    backgroundColor: "#F5F5F5",
-    borderRadius: 12,
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System', // Fixes input font
+    backgroundColor: "#F7F7F7", 
+    borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 14,
-    color: "#333333",
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
+    color: "#333",
+    fontWeight: "500", 
   },
   inputSmall: {
     paddingVertical: 12,
@@ -293,11 +294,61 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   optionsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: "row", // Changed to row to place items side-by-side
+    alignItems: "center", 
+    justifyContent: "space-between", // Pushes checkbox left, forgot pass right
+    marginBottom: 24,
+    marginTop: 8,
+  },
+  forgotPassword: {
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
+    fontSize: 13,
+    color: "#007BFF", 
+    fontWeight: "700",
+  },
+  forgotPasswordSmall: {
+    fontSize: 13,
+  },
+  loginButton: {
+    backgroundColor: "#007BFF", // Match exact blue of SS button
+    borderRadius: 12,
+    paddingVertical: 16,
     alignItems: "center",
-    marginBottom: 28,
-    marginTop: 12,
+    justifyContent: "center",
+    marginBottom: 24,
+  },
+  loginButtonSmall: {
+    paddingVertical: 14,
+    marginBottom: 20,
+  },
+  loginButtonText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#FFFFFF",
+  },
+  loginButtonTextSmall: {
+    fontSize: 16,
+  },
+  signupContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  signupText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#111", // Darker black from SS
+  },
+  signupTextSmall: {
+    fontSize: 12,
+  },
+  signupLink: {
+    fontSize: 13,
+    color: "#007BFF",
+    fontWeight: "600",
+  },
+  signupLinkSmall: {
+    fontSize: 12,
   },
   rememberMeContainer: {
     flexDirection: "row",
@@ -307,14 +358,14 @@ const styles = StyleSheet.create({
     width: 18,
     height: 18,
     marginRight: 8,
-    borderWidth: 2,
-    borderColor: "#0a73ff",
+    borderWidth: 1.5,
+    borderColor: "#007BFF",
     borderRadius: 4,
     justifyContent: "center",
     alignItems: "center",
   },
   checkboxChecked: {
-    backgroundColor: "#0a73ff",
+    backgroundColor: "#007BFF",
   },
   checkboxMark: {
     color: "#FFFFFF",
@@ -322,66 +373,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   checkboxLabel: {
-    fontSize: 14,
-    color: "#999999",
-    maxWidth: 100,
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
+    fontSize: 13,
+    color: "#777777",
+    fontWeight: "500",
   },
   checkboxLabelSmall: {
     fontSize: 12,
   },
-  forgotPassword: {
-    fontSize: 14,
-    color: "#0a73ff",
-    fontWeight: "600",
-  },
-  forgotPasswordSmall: {
-    fontSize: 12,
-  },
-  loginButton: {
-    backgroundColor: "#0a73ff",
-    borderRadius: 16,
-    paddingVertical: 16,
-    paddingHorizontal: 40,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 20,
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  loginButtonSmall: {
-    paddingVertical: 13,
-    marginBottom: 16,
-  },
-  loginButtonText: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#FFFFFF",
-    letterSpacing: 0.5,
-  },
-  loginButtonTextSmall: {
-    fontSize: 15,
-  },
-  signupContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  signupText: {
-    fontSize: 14,
-    color: "#333333",
-  },
-  signupTextSmall: {
-    fontSize: 12,
-  },
-  signupLink: {
-    fontSize: 14,
-    color: "#0a73ff",
-    fontWeight: "700",
-  },
-  signupLinkSmall: {
-    fontSize: 12,
-  },
+
 });

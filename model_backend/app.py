@@ -166,12 +166,10 @@ def generate_gradcam_b64(input_tensor, original_image_pil, target_class):
 def predict():
     image_bytes = None
 
-    # 1. NEW: Check if the request is from the Mobile App (JSON containing a Cloudinary URL)
     if request.is_json and 'image_url' in request.json:
         image_url = request.json['image_url']
         print(f"--> Received Mobile Request for URL: {image_url}")
         try:
-            # Download the image from Cloudinary into memory
             resp = requests.get(image_url)
             if resp.status_code == 200:
                 image_bytes = resp.content
@@ -181,18 +179,15 @@ def predict():
         except Exception as e:
             return jsonify({'error': f'URL request failed: {str(e)}'}), 400
 
-    # 2. EXISTING: Check if the request is from the Web App (Raw File Upload)
     elif 'file' in request.files:
         file = request.files['file']
         if file.filename != '':
             image_bytes = file.read()
 
-    # 3. If neither a file nor a valid URL was provided, reject the request
     if image_bytes is None:
         return jsonify({'error': 'No valid image file or URL provided'}), 400
 
     try:
-        # --- The rest of your ML code remains EXACTLY the same! ---
         image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
 
         ensemble_probs = []

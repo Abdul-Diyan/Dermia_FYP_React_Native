@@ -3,16 +3,16 @@ import { router } from "expo-router";
 import { signOut } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
-  Pressable,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  useColorScheme,
-  useWindowDimensions,
-  View,
+    Alert,
+    Pressable,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TextInput,
+    useColorScheme,
+    useWindowDimensions,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../config/firebaseConfig";
@@ -83,22 +83,7 @@ export default function UserProfilePage() {
               styles.avatarContainer,
               isSmallScreen && styles.avatarContainerSmall,
             ]}
-          >
-            <View style={[styles.avatar, isSmallScreen && styles.avatarSmall]}>
-              <Text
-                style={[
-                  styles.avatarText,
-                  isSmallScreen && styles.avatarTextSmall,
-                ]}
-              >
-                {name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .toUpperCase()}
-              </Text>
-            </View>
-          </View>
+          ></View>
 
           <View
             style={[
@@ -106,28 +91,6 @@ export default function UserProfilePage() {
               isSmallScreen && styles.infoContainerSmall,
             ]}
           >
-            <View style={styles.inputGroup}>
-              <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
-                Full Name
-              </Text>
-              {isEditing ? (
-                <TextInput
-                  style={[styles.input, isSmallScreen && styles.inputSmall]}
-                  value={name}
-                  onChangeText={setName}
-                />
-              ) : (
-                <Text
-                  style={[
-                    styles.displayText,
-                    isSmallScreen && styles.displayTextSmall,
-                  ]}
-                >
-                  {name}
-                </Text>
-              )}
-            </View>
-
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
                 Email
