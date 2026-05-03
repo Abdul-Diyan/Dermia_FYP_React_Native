@@ -1,3 +1,4 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
@@ -16,10 +17,9 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../config/firebaseConfig";
-import { LinearGradient } from "expo-linear-gradient";
 
 export default function LoginPage() {
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark";
 
@@ -76,12 +76,12 @@ export default function LoginPage() {
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
         bounces={false}
-        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
       >
         {/* Header Section */}
         <LinearGradient
-          colors={["#54A3FF", "#0066FF"]} // Vertical gradient matching the screenshot
-          style={[styles.headerSection, { minHeight: height * 0.42 }]} // Extended background
+          colors={["#57A6FF", "#006BE6"]} // Exact colors from image
+          style={styles.headerSection}
         >
           <Text style={[styles.titleText, isSmallScreen && styles.titleTextSmall]}>
             Login
@@ -91,202 +91,174 @@ export default function LoginPage() {
           </Text>
         </LinearGradient>
 
-        <View
-          style={[
-            styles.formContainer,
-            isSmallScreen && styles.formContainerSmall,
-            { width: isSmallScreen ? width * 0.9 : width * 0.85 }, 
-          ]}
-        >
-          <View style={styles.inputGroup}>
-            <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
-              Email or username
-            </Text>
-            <TextInput
-              style={[styles.input, isSmallScreen && styles.inputSmall]}
-              placeholder="rohaan@gmail.com"
-              placeholderTextColor="#999"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-            />
-          </View>
+        {/* Modal Section */}
+        <View style={styles.formContainer}>
+          {/* Inner wrapper to lock inputs to 236px width inside the 352px modal */}
+          <View style={styles.formInner}>
 
-          <View style={styles.inputGroup}>
-            <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
-              Password
-            </Text>
-            <TextInput
-              style={[styles.input, isSmallScreen && styles.inputSmall]}
-              placeholder="••••••••••••••••"
-              placeholderTextColor="#999"
-              secureTextEntry
-              value={password}
-              onChangeText={setPassword}
-            />
-          </View>
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
+                Email or username
+              </Text>
+              <TextInput
+                style={[styles.input, isSmallScreen && styles.inputSmall]}
+                placeholder="rohaan@gmail.com"
+                placeholderTextColor="#999"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+              />
+            </View>
 
-          {/* Options Container (Remember Me Removed, Forgot Password Centered) */}
-          {/* Options Container (Remember Me & Forgot Password) */}
-          <View style={styles.optionsContainer}>
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
+                Password
+              </Text>
+              <TextInput
+                style={[styles.input, isSmallScreen && styles.inputSmall]}
+                placeholder="••••••••••••••••"
+                placeholderTextColor="#999"
+                secureTextEntry
+                value={password}
+                onChangeText={setPassword}
+              />
+            </View>
+
+            <View style={styles.optionsContainer}>
+              <Pressable
+                style={styles.rememberMeContainer}
+                onPress={() => setRememberMe(!rememberMe)}
+              >
+                <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
+                  {rememberMe && <Text style={styles.checkboxMark}>✓</Text>}
+                </View>
+                <Text style={[styles.checkboxLabel, isSmallScreen && styles.checkboxLabelSmall]}>
+                  remember me
+                </Text>
+              </Pressable>
+
+              <Pressable onPress={() => router.push("/forgetpassword_page")}>
+                <Text style={[styles.forgotPassword, isSmallScreen && styles.forgotPasswordSmall]}>
+                  Forgot password ?
+                </Text>
+              </Pressable>
+            </View>
+
             <Pressable
-              style={styles.rememberMeContainer}
-              onPress={() => setRememberMe(!rememberMe)}
-            >
-              <View
-                style={[styles.checkbox, rememberMe && styles.checkboxChecked]}
-              >
-                {rememberMe && <Text style={styles.checkboxMark}>✓</Text>}
-              </View>
-              <Text
-                style={[
-                  styles.checkboxLabel,
-                  isSmallScreen && styles.checkboxLabelSmall,
-                ]}
-              >
-                remember me
-              </Text>
-            </Pressable>
-
-            <Pressable onPress={() => router.push("/forgetpassword_page")}>
-              <Text
-                style={[
-                  styles.forgotPassword,
-                  isSmallScreen && styles.forgotPasswordSmall,
-                ]}
-              >
-                Forgot password ?
-              </Text>
-            </Pressable>
-          </View>
-
-          <Pressable
-            style={({ pressed }) => [
-              styles.loginButton,
-              isSmallScreen && styles.loginButtonSmall,
-              { opacity: pressed ? 0.8 : 1 },
-            ]}
-            onPress={handleLogin}
-          >
-            <Text
-              style={[
-                styles.loginButtonText,
-                isSmallScreen && styles.loginButtonTextSmall,
+              style={({ pressed }) => [
+                styles.loginButton,
+                isSmallScreen && styles.loginButtonSmall,
+                { opacity: pressed ? 0.8 : 1 },
               ]}
+              onPress={handleLogin}
             >
-              Login
-            </Text>
-          </Pressable>
-
-          <View style={styles.signupContainer}>
-            <Text
-              style={[
-                styles.signupText,
-                isSmallScreen && styles.signupTextSmall,
-              ]}
-            >
-              Don't have an account ?{" "}
-            </Text>
-            <Pressable onPress={() => router.push("/signup_page")}>
-              <Text
-                style={[
-                  styles.signupLink,
-                  isSmallScreen && styles.signupLinkSmall,
-                ]}
-              >
-                Sign up
+              <Text style={[styles.loginButtonText, isSmallScreen && styles.loginButtonTextSmall]}>
+                Login
               </Text>
             </Pressable>
+
+            <View style={styles.signupContainer}>
+              <Text style={[styles.signupText, isSmallScreen && styles.signupTextSmall]}>
+                Don't have an account ?{" "}
+              </Text>
+              <Pressable onPress={() => router.push("/signup_page")}>
+                <Text style={[styles.signupLink, isSmallScreen && styles.signupLinkSmall]}>
+                  Sign up
+                </Text>
+              </Pressable>
+            </View>
+
           </View>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
   container: {
     flex: 1,
-    backgroundColor: "#F8F9FA", // Light grey background behind the card
+    backgroundColor: "#F8F9FA",
   },
   contentContainer: {
     flexGrow: 1,
     alignItems: "center",
-    paddingBottom: 12,
+    paddingBottom: 40,
   },
   headerSection: {
     justifyContent: "center",
     alignItems: "center",
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    paddingBottom: 60, // Pushes text up slightly from the card
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: 10,  // Figma Spec
+    borderBottomRightRadius: 10, // Figma Spec
+    height: 395,                 // Figma Spec
     width: "100%",
-    overflow: "hidden",
   },
   titleText: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System', // Forces standard font
+    fontFamily: "Inter-Bold",
     fontSize: 48,
-    fontWeight: "700",
+    // fontWeight: "700",
     color: "#FFFFFF",
     letterSpacing: 0.5,
-    marginBottom: 16, 
+    marginBottom: 16,
   },
   titleTextSmall: {
     fontSize: 40,
   },
   headerSubtitleText: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System', 
+    fontFamily: "Inter-Regular",
     fontSize: 20,
-    fontWeight: "600",
+
     color: "#FFFFFF",
     letterSpacing: 0.3,
-    marginTop: 40, 
+    marginTop: 20,
   },
-    headerSubtitleTextSmall: {
+  headerSubtitleTextSmall: {
     fontSize: 16,
   },
   formContainer: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    marginTop: -130, // Pulls the white card up over the blue background
-    paddingHorizontal: 24,
-    paddingVertical: 32,
-    elevation: 4,
+    borderRadius: 20,
+    width: 352, // Figma Spec
+    marginTop: -100, // Overlaps the blue header beautifully
+    paddingVertical: 40,
+    alignItems: "center", // Centers the formInner
+    elevation: 8,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowRadius: 12,
   },
-  formContainerSmall: {
-    paddingHorizontal: 16,
-    paddingVertical: 24,
-    marginTop: -60,
+  formInner: {
+    width: 236, // Figma Spec (Input/Button width)
   },
   inputGroup: {
     marginBottom: 20,
   },
   label: {
-    fontSize: 14,
-    fontWeight: "600", // Matches the bold label in SS
+    fontSize: 12,
+    fontFamily: 'Inter-SemiBold',
     color: "#555555",
     marginBottom: 8,
   },
   labelSmall: {
-    fontSize: 12,
+    fontSize: 11,
     marginBottom: 6,
   },
   input: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System', // Fixes input font
-    backgroundColor: "#F7F7F7", 
+    fontFamily: "Inter-Regular",
+    backgroundColor: "#F7F7F7",
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 14,
     color: "#333",
-    fontWeight: "500", 
+    width: "100%", // Takes full width of the 236px formInner
   },
   inputSmall: {
     paddingVertical: 12,
@@ -294,40 +266,40 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   optionsContainer: {
-    flexDirection: "row", // Changed to row to place items side-by-side
-    alignItems: "center", 
-    justifyContent: "space-between", // Pushes checkbox left, forgot pass right
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 24,
     marginTop: 8,
   },
   forgotPassword: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
-    fontSize: 13,
-    color: "#007BFF", 
-    fontWeight: "700",
+    fontFamily: "Inter-SemiBold",
+    fontSize: 12,
+    color: "#007BFF",
   },
   forgotPasswordSmall: {
-    fontSize: 13,
+    fontSize: 11,
   },
   loginButton: {
-    backgroundColor: "#007BFF", // Match exact blue of SS button
+    backgroundColor: "#007BFF",
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 24,
+    width: "100%", // Takes full width of the 236px formInner
   },
   loginButtonSmall: {
     paddingVertical: 14,
     marginBottom: 20,
   },
   loginButtonText: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 20,
+    fontFamily: 'Inter-Bold',
     color: "#FFFFFF",
   },
   loginButtonTextSmall: {
-    fontSize: 16,
+    fontSize: 20,
   },
   signupContainer: {
     flexDirection: "row",
@@ -335,28 +307,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   signupText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#111", // Darker black from SS
+    fontSize: 12,
+
+    fontFamily: 'Inter-SemiBold',
+    color: "#111",
   },
   signupTextSmall: {
-    fontSize: 12,
+    fontSize: 11,
   },
   signupLink: {
-    fontSize: 13,
+    fontSize: 12,
     color: "#007BFF",
-    fontWeight: "600",
+
+    fontFamily: 'Inter-SemiBold',
   },
   signupLinkSmall: {
-    fontSize: 12,
+    fontSize: 11,
   },
   rememberMeContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
   checkbox: {
-    width: 18,
-    height: 18,
+    width: 16,
+    height: 16,
     marginRight: 8,
     borderWidth: 1.5,
     borderColor: "#007BFF",
@@ -370,16 +344,14 @@ const styles = StyleSheet.create({
   checkboxMark: {
     color: "#FFFFFF",
     fontWeight: "bold",
-    fontSize: 12,
+    fontSize: 10,
   },
   checkboxLabel: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
-    fontSize: 13,
+    fontFamily: "Inter-Regular",
+    fontSize: 12,
     color: "#777777",
-    fontWeight: "500",
   },
   checkboxLabelSmall: {
-    fontSize: 12,
+    fontSize: 11,
   },
-
 });

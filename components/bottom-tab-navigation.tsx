@@ -1,8 +1,8 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { router, usePathname } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 interface BottomTabNavigationProps {
   isSmallScreen?: boolean;
@@ -27,7 +27,7 @@ export default function BottomTabNavigation({
 
   return (
     <LinearGradient
-      colors={["#3b94ff", "#004dcc"]} // Horizontal gradient matching the header
+      colors={["#0059BF", "#4A9EFF"]}
       start={{ x: 0, y: 0.5 }}
       end={{ x: 1, y: 0.5 }}
       style={[styles.bottomNav, isSmallScreen && styles.bottomNavSmall]}
@@ -51,11 +51,10 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    // backgroundColor removed since LinearGradient handles it now
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    paddingVertical: 16,
+    height: 49,
     paddingHorizontal: 20,
     elevation: 5,
     shadowColor: "#000",
@@ -64,12 +63,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   bottomNavSmall: {
-    paddingVertical: 12,
+    height: 44,
   },
   navItem: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 12, // Keeps the tap target large and easy to hit
   },
 });

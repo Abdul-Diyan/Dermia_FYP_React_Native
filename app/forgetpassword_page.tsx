@@ -1,9 +1,9 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { sendPasswordResetEmail } from "firebase/auth";
 import React, { useState } from "react";
 import {
   Alert,
-  Platform,
   Pressable,
   ScrollView,
   StatusBar,
@@ -12,11 +12,10 @@ import {
   TextInput,
   useColorScheme,
   useWindowDimensions,
-  View,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../config/firebaseConfig";
-import { LinearGradient } from "expo-linear-gradient";
 
 export default function ForgetPasswordPage() {
   const { width, height } = useWindowDimensions();
@@ -74,9 +73,10 @@ export default function ForgetPasswordPage() {
         bounces={false}
         showsHorizontalScrollIndicator={false}
       >
+        {/* Header Section */}
         <LinearGradient
-          colors={["#4E9BFF", "#2B82FF"]}
-          style={[styles.headerSection, { minHeight: height * 0.48 }]} 
+          colors={["#57A6FF", "#006BE6"]} // Exact colors from image
+          style={styles.headerSection}
         >
           <View style={styles.textContainer}>
             <Text
@@ -84,7 +84,7 @@ export default function ForgetPasswordPage() {
             >
               Reset Password
             </Text>
-            
+
             <Text
               style={[
                 styles.subtitleText,
@@ -98,45 +98,43 @@ export default function ForgetPasswordPage() {
           </View>
         </LinearGradient>
 
-        <View
-          style={[
-            styles.formContainer,
-            isSmallScreen && styles.formContainerSmall,
-            { width: isSmallScreen ? width * 0.9 : width * 0.85 },
-          ]}
-        >
-          <View style={styles.inputGroup}>
-            <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
-              Email
-            </Text>
-            <TextInput
-              style={[styles.input, isSmallScreen && styles.inputSmall]}
-              placeholder="rohaan@gmail.com"
-              placeholderTextColor="#999"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              value={email}
-              onChangeText={setEmail}
-            />
-          </View>
+        {/* Modal Section */}
+        <View style={styles.formContainer}>
+          {/* Inner wrapper to lock inputs to 236px width inside the 352px modal */}
+          <View style={styles.formInner}>
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
+                Email
+              </Text>
+              <TextInput
+                style={[styles.input, isSmallScreen && styles.inputSmall]}
+                placeholder="rohaan@gmail.com"
+                placeholderTextColor="#999"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                value={email}
+                onChangeText={setEmail}
+              />
+            </View>
 
-          <Pressable
-            style={({ pressed }) => [
-              styles.resetButton,
-              isSmallScreen && styles.resetButtonSmall,
-              { opacity: pressed ? 0.8 : 1 },
-            ]}
-            onPress={handleResetPassword}
-          >
-            <Text
-              style={[
-                styles.resetButtonText,
-                isSmallScreen && styles.resetButtonTextSmall,
+            <Pressable
+              style={({ pressed }) => [
+                styles.resetButton,
+                isSmallScreen && styles.resetButtonSmall,
+                { opacity: pressed ? 0.8 : 1 },
               ]}
+              onPress={handleResetPassword}
             >
-              Reset Password
-            </Text>
-          </Pressable>
+              <Text
+                style={[
+                  styles.resetButtonText,
+                  isSmallScreen && styles.resetButtonTextSmall,
+                ]}
+              >
+                Reset Password
+              </Text>
+            </Pressable>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -156,92 +154,89 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingBottom: 40,
   },
-  headerSection: {
-    justifyContent: "center",
-    alignItems: "center",
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    paddingBottom: 80, 
-    width: "100%",
-    overflow: "hidden",
-  },
   textContainer: {
-    alignItems: "center", // This centers the text block as a whole
-    paddingHorizontal: 20,
+    width: "100%", // Let the container take full width
+    marginTop: -40,
+    alignItems: "center", // Centers the title
   },
   titleText: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System', 
+    fontFamily: "Inter-Bold",
     fontSize: 40,
-    fontWeight: "bold",
     color: "#FFFFFF",
     letterSpacing: 0.5,
     marginBottom: 24,
-    textAlign: "center",
+    textAlign: "center", // Ensures the main title is perfectly centered
   },
   titleTextSmall: {
     fontSize: 34,
     marginBottom: 16,
   },
   subtitleText: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
-    fontSize: 20, 
-    fontWeight: "600", 
+    fontFamily: "Inter-Regular",
+    fontSize: 20,
     color: "#FFFFFF",
     letterSpacing: 0.3,
-    lineHeight: 28, 
-    textAlign: "left", // This left-aligns the text inside its centered block
+    lineHeight: 28,
+    textAlign: "left",
+    width: 236, // Locks the subtitle width so it wraps exactly like the image
+    marginLeft: 30, // Pushes the subtitle text block slightly to the right
   },
+  headerSection: {
+    justifyContent: "center",
+    alignItems: "center",
+    borderBottomLeftRadius: 10,  // Figma Spec
+    borderBottomRightRadius: 10, // Figma Spec
+    height: 395,                 // Figma Spec
+    width: "100%",
+  },
+
   subtitleTextSmall: {
     fontSize: 18,
     lineHeight: 26,
   },
   formContainer: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    marginTop: -130,
-    paddingHorizontal: 24,
-    paddingVertical: 36, 
-    minHeight: 300, 
-    elevation: 4,
+    borderRadius: 20,
+    width: 352, // Figma Spec
+    marginTop: -100, // Overlaps the blue header
+    paddingVertical: 40,
+    alignItems: "center", // Centers the formInner
+    elevation: 8,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowRadius: 12,
   },
-  formContainerSmall: {
-    paddingHorizontal: 16,
-    paddingVertical: 28,
-    marginTop: -60,
-    minHeight: 260,
+  formInner: {
+    width: 236, // Figma Spec (Input/Button width)
   },
   inputGroup: {
-    marginBottom: 32, 
+    marginBottom: 32,
   },
   label: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
-    fontSize: 14,
-    fontWeight: "600",
+    fontFamily: "Inter-SemiBold",
+    fontSize: 12,
     color: "#555555",
     marginBottom: 8,
   },
   labelSmall: {
-    fontSize: 12,
+    fontSize: 11,
     marginBottom: 6,
   },
   input: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
+    fontFamily: "Inter-Regular",
     backgroundColor: "#F7F7F7",
     borderRadius: 8,
     paddingHorizontal: 16,
-    paddingVertical: 16, 
-    fontSize: 15,
+    paddingVertical: 14,
+    fontSize: 14,
     color: "#333333",
-    fontWeight: "500",
+    width: "100%", // Takes full width of the 236px formInner
   },
   inputSmall: {
     paddingVertical: 12,
     paddingHorizontal: 12,
-    fontSize: 14,
+    fontSize: 12,
   },
   resetButton: {
     backgroundColor: "#007BFF",
@@ -249,12 +244,13 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
+    width: "100%", // Takes full width of the 236px formInner
   },
   resetButtonSmall: {
     paddingVertical: 14,
   },
   resetButtonText: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
+    fontFamily: "Inter-Bold",
     fontSize: 18,
     fontWeight: "600",
     color: "#FFFFFF",

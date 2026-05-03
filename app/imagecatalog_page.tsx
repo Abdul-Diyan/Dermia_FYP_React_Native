@@ -1,4 +1,5 @@
 import BottomTabNavigation from "@/components/bottom-tab-navigation";
+import GradientHeader from "@/components/gradient-header";
 import * as ImagePicker from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
 import {
@@ -28,7 +29,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../config/firebaseConfig";
-import { LinearGradient } from "expo-linear-gradient";
 
 export default function ImageCatalogPage() {
   const { width, height } = useWindowDimensions();
@@ -199,8 +199,8 @@ export default function ImageCatalogPage() {
         styles.imageItem,
         { width: itemSize, height: itemSize },
         selectedImageId === item.id &&
-          mode !== "manage" &&
-          styles.imageItemSelected,
+        mode !== "manage" &&
+        styles.imageItemSelected,
       ]}
       onPress={() => handleImagePress(item)}
     >
@@ -235,24 +235,11 @@ export default function ImageCatalogPage() {
         barStyle={topBarTextStyle}
       />
       <View style={styles.container}>
-    
-
-        <LinearGradient
-                  colors={["#3b94ff", "#004dcc"]} // Light left, dark right
-                  start={{ x: 0, y: 0.5 }}
-                  end={{ x: 1, y: 0.5 }}
-                  style={styles.headerSection}
-                >
-                    <Pressable style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backIcon}>←</Text>
-          </Pressable>
-                  <Text
-                    style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
-                  >
-                    {mode === "manage" ? "Image Catalog" : "Select Image"}
-                  </Text>
-                  <View style={{ width: 50 }} />
-        </LinearGradient>
+        <GradientHeader
+          title={mode === "manage" ? "Image Catalog" : "Select Image"}
+          showBackArrow
+          isSmallScreen={isSmallScreen}
+        />
 
         <ScrollView
           style={styles.scrollContainer}
@@ -269,14 +256,40 @@ export default function ImageCatalogPage() {
             ) : (
               <>
                 <FlatList
-                  data={images}
-                  renderItem={renderImageItem}
+                  data={[...images, { id: 'add-button', isAdd: true }]} // Append the button to the data
+                  renderItem={({ item }) => {
+                    if (item.isAdd) {
+                      return (
+                        <View style={{ width: itemSize, alignItems: 'center', justifyContent: 'center' }}>
+                          <Pressable
+                            style={[
+                              styles.addButton,
+                              {
+                                width: 72,
+                                height: 72,
+                                borderRadius: 36 // Half of 72 for a perfect circle
+                              },
+                            ]}
+                            onPress={pickAndUploadImage}
+                            disabled={isUploading}
+                          >
+                            {isUploading ? (
+                              <ActivityIndicator color="#FFFFFF" size="small" />
+                            ) : (
+                              <Text style={styles.addButtonText}>+</Text>
+                            )}
+                          </Pressable>
+                        </View>
+                      );
+                    }
+                    return renderImageItem({ item });
+                  }}
                   keyExtractor={(item) => item.id}
                   numColumns={itemsPerRow}
                   scrollEnabled={false}
                   columnWrapperStyle={styles.columnWrapper}
                 />
-                <Pressable
+                {/* <Pressable
                   style={[
                     styles.addButton,
                     { width: itemSize, height: itemSize },
@@ -289,7 +302,7 @@ export default function ImageCatalogPage() {
                   ) : (
                     <Text style={styles.addButtonText}>+</Text>
                   )}
-                </Pressable>
+                </Pressable> */}
               </>
             )}
           </View>
@@ -343,36 +356,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
-  headerSection: {
-    backgroundColor: "#0a73ff",
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    alignItems: "center",
-    justifyContent: "space-between",
-    flexDirection: "row",
-  },
-  backButton: {
-    width: 50,
-    height: 50,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  backIcon: {
-    fontSize: 32,
-    color: "#FFFFFF",
-    fontWeight: "700",
-  },
-  headerText: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#FFFFFF",
-    letterSpacing: 0.5,
-    flex: 1,
-    textAlign: "center",
-  },
-  headerTextSmall: {
-    fontSize: 20,
-  },
+
   scrollContainer: {
     flex: 1,
     marginBottom: 100,
@@ -385,8 +369,28 @@ const styles = StyleSheet.create({
   gridContainer: {
     width: "100%",
   },
+
+  addButton: {
+    backgroundColor: "#0a73ff",
+    justifyContent: "center",
+    alignItems: "center",
+    // Elevation/Shadow to make the circle pop (optional)
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  addButtonText: {
+    fontSize: 58, // Adjusted for a 72px circle
+    color: "#FFFFFF",
+
+    fontFamily: 'Inter-Bold',
+    marginTop: -4, // Optical centering: helps the '+' look perfectly centered
+  },
+
   columnWrapper: {
-    flexWrap: "wrap",
+    // Removed flexWrap: "wrap" because FlatList handles wrapping via numColumns
     justifyContent: "flex-start",
     gap: 15,
     marginBottom: 16,
@@ -404,18 +408,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#E8B4B8",
   },
-  addButton: {
-    backgroundColor: "#0a73ff",
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 10,
-  },
-  addButtonText: {
-    fontSize: 48,
-    color: "#FFFFFF",
-    fontWeight: "700",
-  },
+
+
   buttonContainer: {
     position: "absolute",
     bottom: 110,
@@ -445,7 +439,8 @@ const styles = StyleSheet.create({
   },
   doneButtonText: {
     fontSize: 20,
-    fontWeight: "700",
+
+    fontFamily: 'Inter-Bold',
     color: "#FFFFFF",
     letterSpacing: 0.5,
   },

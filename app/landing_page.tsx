@@ -1,8 +1,8 @@
+import { LinearGradient } from "expo-linear-gradient"; // Import LinearGradient
 import { router } from "expo-router";
 import React from "react";
 import {
-  Image,
-  Platform, // Added for consistent font rendering if needed
+  Image, // Added for consistent font rendering if needed
   Pressable,
   ScrollView,
   StatusBar,
@@ -10,10 +10,9 @@ import {
   Text,
   useColorScheme,
   useWindowDimensions,
-  View,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { LinearGradient } from "expo-linear-gradient"; // Import LinearGradient
 
 const LandingPage = () => {
   const { width, height } = useWindowDimensions();
@@ -41,11 +40,11 @@ const LandingPage = () => {
       >
         {/* Replaced View with LinearGradient */}
         <LinearGradient
-          colors={["#4DA1FF", "#0066FF"]} // The same gradient colors used previously
+          colors={["#4EA1FF", "#0077FF"]} // Updated to your exact Figma colors
           style={[
             styles.headerSection,
             {
-              minHeight: height * 0.35,
+              height: 302, // Exact height from Figma
               width: "100%",
             },
           ]}
@@ -58,16 +57,16 @@ const LandingPage = () => {
         </LinearGradient>
 
         <View style={styles.bodySection}>
-          <View style={[styles.illustrationSection, { height: height * 0.3 }]}>
+          <View style={[styles.illustrationSection, { marginTop: 30 }]}>
             <Image
               source={require("@/assets/images/doctors-illustration.png")}
-              style={[
-                styles.doctorsImage,
-                { width: width * 0.75, height: "100%", resizeMode: "contain" },
-              ]}
+              style={{
+                width: 184, // Figma width
+                height: 147, // Figma height
+                resizeMode: "contain"
+              }}
             />
           </View>
-
           <View style={styles.textSection}>
             <Text
               style={[styles.mainText, isSmallScreen && styles.mainTextSmall]}
@@ -113,6 +112,31 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
+
+  headerSection: {
+    justifyContent: "center",
+    alignItems: "center",
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: 30, // Figma radius
+    borderBottomRightRadius: 30, // Figma radius
+    overflow: "hidden",
+  },
+  button: {
+    backgroundColor: "#3895FF", // Figma button color
+    width: 215, // Figma size
+    height: 88, // Figma size
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    marginTop: 40, // Adjusts Y-axis positioning roughly to Figma specs
+  },
+
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
@@ -121,19 +145,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: "center",
   },
-  headerSection: {
-    // backgroundColor: "#0a73ff", <-- Removed as LinearGradient handles this now
-    justifyContent: "center",
-    alignItems: "center",
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
-    paddingBottom: 20,
-    overflow: "hidden",
-  },
+
   titleText: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
+    fontFamily: "Inter-Bold",
     fontSize: 72,
-    fontWeight: "700",
     color: "#FFFFFF",
     letterSpacing: 1,
   },
@@ -159,9 +174,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   mainText: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
+    fontFamily: "Inter-SemiBold",
     fontSize: 36,
-    fontWeight: "700",
     color: "#000000",
     textAlign: "center",
     letterSpacing: 0.5,
@@ -170,9 +184,8 @@ const styles = StyleSheet.create({
     fontSize: 28,
   },
   subText: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
+    fontFamily: "Inter-SemiBold",
     fontSize: 36,
-    fontWeight: "700",
     color: "#000000",
     textAlign: "center",
     marginTop: 8,
@@ -185,29 +198,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
   },
-  button: {
-    backgroundColor: "#007BFF", // Matched the blue from the previous pages
-    paddingVertical: 18,
-    paddingHorizontal: 40,
-    borderRadius: 24,
-    alignItems: "center",
-    justifyContent: "center",
-    minWidth: 280,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-  },
   buttonSmall: {
     paddingVertical: 16,
     paddingHorizontal: 30,
     minWidth: 220,
   },
   buttonText: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
+    fontFamily: "Inter-SemiBold",
     fontSize: 28,
-    fontWeight: "700",
     color: "#FFFFFF",
     letterSpacing: 0.5,
   },

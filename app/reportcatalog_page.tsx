@@ -1,4 +1,5 @@
 import BottomTabNavigation from "@/components/bottom-tab-navigation";
+import GradientHeader from "@/components/gradient-header";
 import { router } from "expo-router";
 import {
   collection,
@@ -15,6 +16,7 @@ import {
   Alert,
   FlatList,
   Image,
+  Modal,
   Pressable,
   ScrollView,
   StatusBar,
@@ -26,7 +28,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../config/firebaseConfig";
-import { LinearGradient } from "expo-linear-gradient";
 
 export default function ReportCatalogPage() {
   const { width, height } = useWindowDimensions();
@@ -36,6 +37,7 @@ export default function ReportCatalogPage() {
 
   const [reports, setReports] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isClearModalVisible, setClearModalVisible] = useState(false);
 
   const itemsPerRow = 2;
   const itemSize = (width - 80) / itemsPerRow;
@@ -70,44 +72,35 @@ export default function ReportCatalogPage() {
   }, []);
 
   const handleClearHistory = () => {
-    Alert.alert(
-      "Clear History",
-      "Are you sure you want to delete these reports?",
-      [
-        { text: "Cancel", onPress: () => {}, style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              const user = auth.currentUser;
-              if (!user) return;
-
-              const batch = writeBatch(db);
-              reports.forEach((report) => {
-                const reportRef = doc(
-                  db,
-                  "users",
-                  user.uid,
-                  "reports",
-                  report.id,
-                );
-                batch.delete(reportRef);
-              });
-
-              await batch.commit();
-              setReports([]);
-              Alert.alert("Success", "History cleared.");
-            } catch (error) {
-              console.error("Error clearing history:", error);
-              Alert.alert("Error", "Could not clear history.");
-            }
-          },
-        },
-      ],
-    );
+    setClearModalVisible(true); // Just opens the modal now
   };
 
+  const confirmClearHistory = async () => {
+    setClearModalVisible(false); // Close modal immediately for snappy UI
+    try {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const batch = writeBatch(db);
+      reports.forEach((report) => {
+        const reportRef = doc(
+          db,
+          "users",
+          user.uid,
+          "reports",
+          report.id,
+        );
+        batch.delete(reportRef);
+      });
+
+      await batch.commit();
+      setReports([]);
+      Alert.alert("Success", "History cleared.");
+    } catch (error) {
+      console.error("Error clearing history:", error);
+      Alert.alert("Error", "Could not clear history.");
+    }
+  };
   const renderReportItem = ({ item }: { item: any }) => (
     <Pressable
       style={[
@@ -146,29 +139,30 @@ export default function ReportCatalogPage() {
         barStyle={topBarTextStyle}
       />
       <View style={styles.container}>
-        
-        <LinearGradient
-         
+        <GradientHeader
+          title="Report History"
+          showBackArrow
+          isSmallScreen={isSmallScreen}
+        />
+        {/* <LinearGradient
+
           colors={["#3b94ff", "#004dcc"]}  // Updated to app standard gradient
           start={{ x: 0, y: 0.5 }}
-  end={{ x: 1, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
           style={styles.headerSection}
         >
-          {/* LEFT SIDE: 100px wide container to balance the right side */}
           <View style={styles.headerSideContainer}>
             <Pressable style={styles.backButton} onPress={() => router.back()}>
               <Text style={styles.backIcon}>←</Text>
             </Pressable>
           </View>
 
-          {/* MIDDLE: Text perfectly centered */}
           <Text
             style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
           >
             Report History
           </Text>
 
-          {/* RIGHT SIDE: 100px wide container for the Clear button */}
           <View style={[styles.headerSideContainer, { alignItems: 'flex-end' }]}>
             <Pressable style={styles.clearButton} onPress={handleClearHistory}>
               <Text
@@ -181,13 +175,25 @@ export default function ReportCatalogPage() {
               </Text>
             </Pressable>
           </View>
-        </LinearGradient>
+        </LinearGradient> */}
 
         <ScrollView
           style={styles.scrollContainer}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
+          <View style={{ alignItems: 'flex-end', width: '100%', marginBottom: 15 }}>
+            <Pressable style={styles.clearButton} onPress={handleClearHistory}>
+              <Text
+                style={[
+                  styles.clearButtonText,
+                  isSmallScreen && styles.clearButtonTextSmall,
+                ]}
+              >
+                Clear History
+              </Text>
+            </Pressable>
+          </View>
           {isLoading ? (
             <ActivityIndicator
               size="large"
@@ -219,9 +225,41 @@ export default function ReportCatalogPage() {
           )}
         </ScrollView>
 
+        {/* Custom Confirmation Modal */}
+        <Modal
+          visible={isClearModalVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setClearModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.customAlertBox}>
+              <Text style={styles.alertTitle}>Clear History</Text>
+              <Text style={styles.alertMessage}>Are you sure you want to delete these reports?</Text>
+
+              <View style={styles.alertButtonGroup}>
+                <Pressable
+                  style={styles.alertActionBtn}
+                  onPress={confirmClearHistory}
+                >
+                  <Text style={styles.alertActionTextDestructive}>Delete</Text>
+                </Pressable>
+
+                <Pressable
+                  style={styles.alertCancelBtn}
+                  onPress={() => setClearModalVisible(false)}
+                >
+                  <Text style={styles.alertCancelText}>Cancel</Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
         <BottomTabNavigation isSmallScreen={isSmallScreen} />
       </View>
     </SafeAreaView>
+
   );
 }
 
@@ -257,7 +295,8 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 24,
-    fontWeight: "700",
+
+    fontFamily: 'Inter-Bold',
     color: "#FFFFFF",
     letterSpacing: 0.5,
     flex: 1,
@@ -271,7 +310,8 @@ const styles = StyleSheet.create({
   },
   clearButtonText: {
     fontSize: 14,
-    fontWeight: "700", // Made slightly bolder
+
+    fontFamily: 'Inter-SemiBold',
     color: "#FF8888", // Lightened red so it passes contrast checks on blue
   },
   clearButtonTextSmall: {
@@ -315,7 +355,7 @@ const styles = StyleSheet.create({
   },
   reportTitle: {
     fontSize: 16,
-    fontWeight: "700",
+    fontFamily: 'Inter-SemiBold',
     color: "#333333",
     textAlign: "center",
   },
@@ -324,6 +364,8 @@ const styles = StyleSheet.create({
   },
   reportDate: {
     fontSize: 12,
+
+    fontFamily: 'Inter-Regular',
     color: "#666666",
     marginTop: 4,
   },
@@ -339,5 +381,67 @@ const styles = StyleSheet.create({
   },
   emptyTextSmall: {
     fontSize: 14,
+  },
+  emptyTextSmall: {
+    fontSize: 14,
+  },
+  // Custom Modal Styles added below
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Dark semi-transparent background
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  customAlertBox: {
+    backgroundColor: "#FFFFFF",
+    width: "80%",
+    borderRadius: 16,
+    paddingTop: 24,
+    paddingBottom: 16,
+    alignItems: "center",
+    elevation: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+  },
+  alertTitle: {
+    fontFamily: "Inter-Bold",
+    fontSize: 20,
+    color: "#000000",
+    marginBottom: 10,
+  },
+  alertMessage: {
+    fontFamily: "Inter-Regular",
+    fontSize: 15,
+    color: "#555555",
+    textAlign: "center",
+    paddingHorizontal: 20,
+    marginBottom: 24,
+  },
+  alertButtonGroup: {
+    width: "100%",
+    borderTopWidth: 1,
+    borderColor: "#EEEEEE",
+  },
+  alertActionBtn: {
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderColor: "#EEEEEE",
+    alignItems: "center",
+  },
+  alertActionTextDestructive: {
+    fontFamily: "Inter-SemiBold",
+    fontSize: 16,
+    color: "#FF3B30", // Red text for destructive action
+  },
+  alertCancelBtn: {
+    paddingVertical: 16,
+    alignItems: "center",
+  },
+  alertCancelText: {
+    fontFamily: "Inter-SemiBold",
+    fontSize: 16,
+    color: "#007BFF", // Standard blue for safe cancel action
   },
 });

@@ -1,9 +1,9 @@
+import { LinearGradient } from "expo-linear-gradient"; // Use LinearGradient as requested
 import { router } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import {
   Alert,
-  Platform,
   Pressable,
   ScrollView,
   StatusBar,
@@ -12,11 +12,10 @@ import {
   TextInput,
   useColorScheme,
   useWindowDimensions,
-  View,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../config/firebaseConfig";
-import { LinearGradient } from "expo-linear-gradient"; // Use LinearGradient as requested
 
 export default function SignupPage() {
   const { width, height } = useWindowDimensions();
@@ -70,93 +69,81 @@ export default function SignupPage() {
         bounces={false}
         showsHorizontalScrollIndicator={false}
       >
+        {/* Header Section */}
         <LinearGradient
-          colors={["#4DA1FF", "#0066FF"]} // Match the gradient in image_3.png
-          style={[styles.headerSection, { minHeight: height * 0.48 }]} // Elongated to match forgot password page length
+          colors={["#57A6FF", "#006BE6"]} // Exact colors from image
+          style={styles.headerSection}
         >
-          <Text
-            style={[styles.titleText, isSmallScreen && styles.titleTextSmall]}
-          >
+          <Text style={[styles.titleText, isSmallScreen && styles.titleTextSmall]}>
             Sign up
           </Text>
-          
-          {/* Moved the 'Create new Account' text out of the card and made it white */}
-          <Text
-            style={[styles.headerSubtitleText, isSmallScreen && styles.headerSubtitleTextSmall]}
-          >
+          <Text style={[styles.headerSubtitleText, isSmallScreen && styles.headerSubtitleTextSmall]}>
             Create a new Account
           </Text>
         </LinearGradient>
 
-        <View
-          style={[
-            styles.formContainer,
-            isSmallScreen && styles.formContainerSmall,
-            { width: isSmallScreen ? width * 0.9 : width * 0.85 }, // Center and responsive width
-          ]}
-        >
-          {/* Removed internal 'Create a new Account' text from here */}
-          
-          <View style={styles.inputGroup}>
-            <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
-              Email
-            </Text>
-            <TextInput
-              style={[styles.input, isSmallScreen && styles.inputSmall]}
-              placeholder="rohaan@gmail.com"
-              placeholderTextColor="#999"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              value={email}
-              onChangeText={setEmail}
-            />
-          </View>
+        {/* Modal Section */}
+        <View style={styles.formContainer}>
+          {/* Inner wrapper locks inputs to 236px width inside the 352px modal */}
+          <View style={styles.formInner}>
 
-          <View style={styles.inputGroup}>
-            <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
-              Username
-            </Text>
-            <TextInput
-              style={[styles.input, isSmallScreen && styles.inputSmall]}
-              placeholder="rohaan.awan99"
-              placeholderTextColor="#999"
-              autoCapitalize="none"
-              value={username}
-              onChangeText={setUsername}
-            />
-          </View>
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
+                Email
+              </Text>
+              <TextInput
+                style={[styles.input, isSmallScreen && styles.inputSmall]}
+                placeholder="rohaan@gmail.com"
+                placeholderTextColor="#999"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+              />
+            </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
-              Password
-            </Text>
-            <TextInput
-              style={[styles.input, isSmallScreen && styles.inputSmall]}
-              placeholder="••••••••••••••••" // Match image with bullets
-              placeholderTextColor="#999"
-              secureTextEntry
-              value={password}
-              onChangeText={setPassword}
-            />
-          </View>
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
+                Username
+              </Text>
+              <TextInput
+                style={[styles.input, isSmallScreen && styles.inputSmall]}
+                placeholder="rohaan.awan99"
+                placeholderTextColor="#999"
+                value={username}
+                onChangeText={setUsername}
+                autoCapitalize="none"
+              />
+            </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
-              Confirm Password
-            </Text>
-            <TextInput
-              style={[styles.input, isSmallScreen && styles.inputSmall]}
-              placeholder="••••••••••••••••" // Match image with bullets
-              placeholderTextColor="#999"
-              secureTextEntry
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-            />
-          </View>
-          
-          {/* Note: Internal 'Forgot password?' is ignored as per instructions */}
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
+                Password
+              </Text>
+              <TextInput
+                style={[styles.input, isSmallScreen && styles.inputSmall]}
+                placeholder="••••••••••••••••"
+                placeholderTextColor="#999"
+                secureTextEntry
+                value={password}
+                onChangeText={setPassword}
+              />
+            </View>
 
-          <View style={{ marginTop: 12 }}>
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
+                Confirm Password
+              </Text>
+              <TextInput
+                style={[styles.input, isSmallScreen && styles.inputSmall]}
+                placeholder="••••••••••••••••"
+                placeholderTextColor="#999"
+                secureTextEntry
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+              />
+            </View>
+
             <Pressable
               style={({ pressed }) => [
                 styles.signupButton,
@@ -165,33 +152,22 @@ export default function SignupPage() {
               ]}
               onPress={handleSignup}
             >
-              <Text
-                style={[
-                  styles.signupButtonText,
-                  isSmallScreen && styles.signupButtonTextSmall,
-                ]}
-              >
+              <Text style={[styles.signupButtonText, isSmallScreen && styles.signupButtonTextSmall]}>
                 Sign up
               </Text>
             </Pressable>
-          </View>
 
-          <View style={styles.loginContainer}>
-            <Text
-              style={[styles.loginText, isSmallScreen && styles.loginTextSmall]}
-            >
-              Already have an account?{" "}
-            </Text>
-            <Pressable onPress={() => router.push("/login_page")}>
-              <Text
-                style={[
-                  styles.loginLink,
-                  isSmallScreen && styles.loginLinkSmall,
-                ]}
-              >
-                Login
+            <View style={styles.loginContainer}>
+              <Text style={[styles.loginText, isSmallScreen && styles.loginTextSmall]}>
+                Already have an account ?{" "}
               </Text>
-            </Pressable>
+              <Pressable onPress={() => router.push("/login_page")}>
+                <Text style={[styles.loginLink, isSmallScreen && styles.loginLinkSmall]}>
+                  Login
+                </Text>
+              </Pressable>
+            </View>
+
           </View>
         </View>
       </ScrollView>
@@ -213,81 +189,74 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   headerSection: {
-    // Gradient is applied directly via LinearGradient
     justifyContent: "center",
     alignItems: "center",
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
-    paddingBottom: 80, // Allow space for the subtitle above the card
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: 10,  // Figma Spec
+    borderBottomRightRadius: 10, // Figma Spec
+    height: 395,                 // Figma Spec
     width: "100%",
-    overflow: "hidden",
   },
   titleText: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
-    fontSize: 56, // Match target image size
-    fontWeight: "700",
-    color: "#FFFFFF",
-    letterSpacing: 1,
-    marginBottom: 24, // Space between title and subtitle
-    textAlign: "center",
-  },
-  titleTextSmall: {
+    fontFamily: "Inter-Bold",
     fontSize: 48,
+    color: "#FFFFFF",
+    letterSpacing: 0.5,
     marginBottom: 16,
   },
+  titleTextSmall: {
+    fontSize: 40,
+  },
   headerSubtitleText: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
-    fontSize: 22, // Match target image size
-    fontWeight: "600",
-    color: "#FFFFFF", // White text above the card
-    letterSpacing: 0.5,
-    textAlign: "center",
+    fontFamily: "Inter-SemiBold",
+    fontSize: 20,
+    color: "#FFFFFF",
+    letterSpacing: 0.3,
+    marginTop: 20, // Increase this value to push the subtitle further down!
   },
   headerSubtitleTextSmall: {
-    fontSize: 18,
+    fontSize: 16,
   },
   formContainer: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    marginTop: -130, // Deeper overlap to match elongated header
-    paddingHorizontal: 24,
-    paddingVertical: 36, // Match shadow depth and padding in image_3.png
-    minHeight: 380, // Provide ample space for inputs
+    borderRadius: 20,
+    width: 352, // Figma Spec
+    marginTop: -100, // Overlaps the blue header
+    paddingVertical: 40,
+    alignItems: "center", // Centers the formInner
     elevation: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.1,
     shadowRadius: 12,
   },
-  formContainerSmall: {
-    paddingHorizontal: 16,
-    paddingVertical: 28,
-    minHeight: 340,
+  formInner: {
+    width: 236, // Figma Spec (Input/Button width)
   },
   inputGroup: {
     marginBottom: 20,
   },
   label: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "600",
     color: "#555555",
     marginBottom: 8,
   },
   labelSmall: {
-    fontSize: 12,
+    fontSize: 11,
     marginBottom: 6,
   },
   input: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
-    backgroundColor: "#F7F7F7", // Match the lighter grey input background
-    borderRadius: 12,
+    fontFamily: "Inter-Regular",
+    backgroundColor: "#F7F7F7",
+    borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    fontSize: 15,
-    color: "#333333",
-    borderWidth: 0, // Borderless inputs like target image
+    fontSize: 14,
+    color: "#333",
     fontWeight: "500",
+    width: "100%", // Takes full width of the 236px formInner
   },
   inputSmall: {
     paddingVertical: 12,
@@ -295,33 +264,26 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   signupButton: {
-    backgroundColor: "#007BFF", // Match exact button blue
-    borderRadius: 16,
+    backgroundColor: "#007BFF",
+    borderRadius: 12,
     paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
+    marginBottom: 24,
     marginTop: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    width: "100%", // Takes full width of the 236px formInner
   },
   signupButtonSmall: {
-    paddingVertical: 13,
-    marginBottom: 16,
-    marginTop: 8,
+    paddingVertical: 14,
+    marginBottom: 20,
   },
   signupButtonText: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
     fontSize: 18,
-    fontWeight: "700",
+    fontFamily: 'Inter-Bold',
     color: "#FFFFFF",
-    letterSpacing: 0.5,
   },
   signupButtonTextSmall: {
-    fontSize: 15,
+    fontSize: 16,
   },
   loginContainer: {
     flexDirection: "row",
@@ -329,21 +291,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   loginText: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
-    fontSize: 14,
-    color: "#333333",
-    fontWeight: "500",
+    fontSize: 12,
+
+    fontFamily: 'Inter-SemiBold',
+    color: "#111",
+
   },
   loginTextSmall: {
-    fontSize: 12,
+    fontSize: 11,
   },
   loginLink: {
-    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
-    fontSize: 14,
-    color: "#007BFF", // Match blue link color
-    fontWeight: "700",
+    fontSize: 12,
+    color: "#007BFF",
+
+    fontFamily: 'Inter-SemiBold',
   },
   loginLinkSmall: {
-    fontSize: 12,
+    fontSize: 11,
   },
 });

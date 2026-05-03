@@ -1,22 +1,21 @@
 import BottomTabNavigation from "@/components/bottom-tab-navigation";
+import GradientHeader from "@/components/gradient-header";
 import { router } from "expo-router";
 import { signOut } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import {
-    Alert,
-    Pressable,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    useColorScheme,
-    useWindowDimensions,
-    View,
+  Alert,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  useWindowDimensions,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../config/firebaseConfig";
-import { LinearGradient } from "expo-linear-gradient";
 
 export default function UserProfilePage() {
   const { width } = useWindowDimensions();
@@ -57,7 +56,7 @@ export default function UserProfilePage() {
         barStyle={topBarTextStyle}
       />
       <View style={styles.container}>
-        <LinearGradient
+        {/* <LinearGradient
                           colors={["#3b94ff", "#004dcc"]} // Light left, dark right
                           start={{ x: 0, y: 0.5 }}
                           end={{ x: 1, y: 0.5 }}
@@ -77,67 +76,32 @@ export default function UserProfilePage() {
           >
             <Text style={styles.editIcon}>{isEditing ? "✓" : "✏"}</Text>
           </Pressable>
-                </LinearGradient>
+                </LinearGradient> */}
+        <GradientHeader
+          title="User Profile"
+          showBackArrow
+          isSmallScreen={isSmallScreen}
+        />
 
         <ScrollView
           style={styles.scrollContainer}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <View
-            style={[
-              styles.avatarContainer,
-              isSmallScreen && styles.avatarContainerSmall,
-            ]}
-          ></View>
-
-          <View
-            style={[
-              styles.infoContainer,
-              isSmallScreen && styles.infoContainerSmall,
-            ]}
-          >
-            <View style={styles.inputGroup}>
-              <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
-                Email
-              </Text>
-              {isEditing ? (
-                <TextInput
-                  style={[styles.input, isSmallScreen && styles.inputSmall]}
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-              ) : (
-                <Text
-                  style={[
-                    styles.displayText,
-                    isSmallScreen && styles.displayTextSmall,
-                  ]}
-                >
-                  {email}
-                </Text>
-              )}
-            </View>
-          </View>
-
+          {/* Reset Password Link */}
           <Pressable
-            style={({ pressed }) => [
-              styles.logoutButton,
-              isSmallScreen && styles.logoutButtonSmall,
-              { opacity: pressed ? 0.8 : 1 },
-            ]}
+            style={styles.linkWrapper}
+            onPress={() => router.push("/forgetpassword_page")}
+          >
+            <Text style={[styles.linkText, styles.resetText]}>Reset Password</Text>
+          </Pressable>
+
+          {/* Logout Link */}
+          <Pressable
+            style={styles.linkWrapper}
             onPress={handleLogout}
           >
-            <Text
-              style={[
-                styles.logoutButtonText,
-                isSmallScreen && styles.logoutButtonTextSmall,
-              ]}
-            >
-              Logout
-            </Text>
+            <Text style={[styles.linkText, styles.logoutText]}>Log out</Text>
           </Pressable>
         </ScrollView>
 
@@ -150,6 +114,31 @@ export default function UserProfilePage() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+  },
+  scrollContainer: {
+    flex: 1,
+    marginBottom: 80,
+  },
+  scrollContent: {
+    paddingHorizontal: 40, // Aligns text to the left with margin as seen in image_0a7f4d.png
+    paddingVertical: 40,
+  },
+  linkWrapper: {
+    paddingVertical: 15,
+    alignSelf: 'flex-start',
+  },
+  linkText: {
+    fontSize: 20,
+
+    fontFamily: 'Inter-SemiBold',
+    letterSpacing: 0.3,
+  },
+  resetText: {
+    color: "#0a73ff",
+    marginBottom: 5,
+  },
+  logoutText: {
+    color: "#FF0000", // Matches the red logout text in image_0a7f4d.png
   },
   container: {
     flex: 1,
@@ -195,15 +184,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: "#FFFFFF",
     fontWeight: "700",
-  },
-  scrollContainer: {
-    flex: 1,
-    marginBottom: 80,
-  },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingVertical: 24,
-    paddingBottom: 40,
   },
   avatarContainer: {
     alignItems: "center",

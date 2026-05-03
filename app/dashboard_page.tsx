@@ -1,11 +1,12 @@
 import BottomTabNavigation from "@/components/bottom-tab-navigation";
+import GradientHeader from "@/components/gradient-header";
 import { router, useFocusEffect } from "expo-router";
 import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Image,
+  Modal,
   Pressable,
   ScrollView,
   StatusBar,
@@ -13,11 +14,10 @@ import {
   Text,
   useColorScheme,
   useWindowDimensions,
-  View,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../config/firebaseConfig";
-import { LinearGradient } from "expo-linear-gradient";
 
 export default function DashboardPage() {
   const { width, height } = useWindowDimensions();
@@ -28,6 +28,7 @@ export default function DashboardPage() {
   const [recentImages, setRecentImages] = useState<any[]>([]);
   const [recentReports, setRecentReports] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAlertVisible, setAlertVisible] = useState(false);
 
   const topBarColor = isDarkMode ? "#000000" : "#FFFFFF";
   const topBarTextStyle = isDarkMode ? "light-content" : "dark-content";
@@ -86,18 +87,7 @@ export default function DashboardPage() {
       />
       <View style={styles.container}>
         {/* Header Section */}
-        <LinearGradient
-          colors={["#3b94ff", "#004dcc"]} // Light left, dark right
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
-          style={styles.headerSection}
-        >
-          <Text
-            style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
-          >
-            Welcome Back !
-          </Text>
-        </LinearGradient>
+        <GradientHeader title="Welcome Back !" isSmallScreen={isSmallScreen} />
 
         <ScrollView
           style={styles.scrollContainer}
@@ -178,6 +168,7 @@ export default function DashboardPage() {
           </View>
 
           {/* Start Diagnosis Button Section */}
+          {/* Start Diagnosis Button Section */}
           <View style={styles.diagnosisSectionWrapper}>
             <Pressable
               style={({ pressed }) => [
@@ -185,23 +176,59 @@ export default function DashboardPage() {
                 isSmallScreen && styles.diagnosisButtonSmall,
                 { opacity: pressed ? 0.8 : 1 },
               ]}
-              onPress={() => {
-                Alert.alert(
-                  "Start Diagnosis",
-                  "How would you like to provide the image?",
-                  [
-                    { text: "Cancel", style: "cancel" },
-                    { text: "Previous Scan", onPress: () => router.push({ pathname: "/imagecatalog_page", params: { mode: "select" } }) },
-                    { text: "Upload New Photo", onPress: () => router.push({ pathname: "/imagecatalog_page", params: { mode: "upload" } }) },
-                  ]
-                );
-              }}
+              onPress={() => setAlertVisible(true)} // <-- Now opens custom modal
             >
               <Text style={[styles.diagnosisButtonText, isSmallScreen && styles.diagnosisButtonTextSmall]}>
                 Start Diagnosis
               </Text>
             </Pressable>
           </View>
+          {/* </ScrollView> */}
+
+          {/* Custom Alert Modal */}
+          <Modal
+            visible={isAlertVisible}
+            transparent={true}
+            animationType="fade"
+            onRequestClose={() => setAlertVisible(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.customAlertBox}>
+                <Text style={styles.alertTitle}>Start Diagnosis</Text>
+                <Text style={styles.alertMessage}>How would you like to provide the image?</Text>
+
+                <View style={styles.alertButtonGroup}>
+                  <Pressable
+                    style={styles.alertActionBtn}
+                    onPress={() => {
+                      setAlertVisible(false);
+                      router.push({ pathname: "/imagecatalog_page", params: { mode: "select" } });
+                    }}
+                  >
+                    <Text style={styles.alertActionText}>Previous Scan</Text>
+                  </Pressable>
+
+                  <Pressable
+                    style={styles.alertActionBtn}
+                    onPress={() => {
+                      setAlertVisible(false);
+                      router.push({ pathname: "/imagecatalog_page", params: { mode: "upload" } });
+                    }}
+                  >
+                    <Text style={styles.alertActionText}>Upload New Photo</Text>
+                  </Pressable>
+
+                  <Pressable
+                    style={styles.alertCancelBtn}
+                    onPress={() => setAlertVisible(false)}
+                  >
+                    <Text style={styles.alertCancelText}>Cancel</Text>
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          </Modal>
+
         </ScrollView>
 
         <BottomTabNavigation isSmallScreen={isSmallScreen} />
@@ -218,21 +245,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF", // Changed to pure white to match screenshot
   },
-  headerSection: {
-    paddingVertical: 24,
-    paddingHorizontal: 20,
-    alignItems: "center",
-    // Background color removed as it's now handled by LinearGradient
-  },
-  headerText: {
-    fontSize: 22, // Adjusted size to match SS
-    fontWeight: "600",
-    color: "#FFFFFF",
-    letterSpacing: 0.5,
-  },
-  headerTextSmall: {
-    fontSize: 18,
-  },
+
   scrollContainer: {
     flex: 1,
   },
@@ -246,7 +259,8 @@ const styles = StyleSheet.create({
   },
   sectionTitleHeader: {
     fontSize: 16,
-    fontWeight: "700",
+
+    fontFamily: 'Inter-SemiBold',
     color: "#0066FF", // Exact blue from the screenshot text
     marginBottom: 8,
   },
@@ -275,31 +289,34 @@ const styles = StyleSheet.create({
   },
   viewAllLink: {
     fontSize: 14,
-    fontWeight: "700",
+
+    fontFamily: 'Inter-SemiBold',
     color: "#4FA0FF", // Lighter blue for the link text
   },
   viewAllLinkSmall: {
     fontSize: 13,
   },
   diagnosisSectionWrapper: {
-    marginTop: 100, // Increased significantly to push the button lower
-    alignItems: "center", 
+    marginTop: 80,
+    alignItems: "center",
   },
   diagnosisButton: {
-    backgroundColor: "#007BFF", 
-    borderRadius: 8, 
-    paddingVertical: 14, // Slightly thinner vertically
+    backgroundColor: "#0077FF",
+    borderRadius: 9,
+    width: 220,
+    height: 70,
     alignItems: "center",
     justifyContent: "center",
-    width: 200, // Reduced width to match the screenshot proportions
   },
   diagnosisButtonSmall: {
-    paddingVertical: 14,
-    width: 180,
+    width: 110,
+    height: 60,
   },
   diagnosisButtonText: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: 20,
+
+    fontFamily: 'Inter-Bold',
+    // fontWeight: "700",
     color: "#FFFFFF",
   },
   diagnosisButtonTextSmall: {
@@ -332,7 +349,8 @@ const styles = StyleSheet.create({
   },
   reportText: {
     fontSize: 14,
-    fontWeight: "500",
+
+    fontFamily: 'Inter-Regular',
     color: "#555", // Dark grey text inside report card
     textAlign: "center",
   },
@@ -365,5 +383,64 @@ const styles = StyleSheet.create({
   emptyPromptText: {
     fontSize: 11,
     color: "#999",
+  },
+  // Custom Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Dark semi-transparent background
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  customAlertBox: {
+    backgroundColor: "#FFFFFF",
+    width: "80%",
+    borderRadius: 16,
+    paddingTop: 24,
+    paddingBottom: 16,
+    alignItems: "center",
+    elevation: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+  },
+  alertTitle: {
+    fontFamily: "Inter-Bold",
+    fontSize: 20,
+    color: "#000000",
+    marginBottom: 10,
+  },
+  alertMessage: {
+    fontFamily: "Inter-Regular",
+    fontSize: 15,
+    color: "#555555",
+    textAlign: "center",
+    paddingHorizontal: 20,
+    marginBottom: 24,
+  },
+  alertButtonGroup: {
+    width: "100%",
+    borderTopWidth: 1,
+    borderColor: "#EEEEEE",
+  },
+  alertActionBtn: {
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderColor: "#EEEEEE",
+    alignItems: "center",
+  },
+  alertActionText: {
+    fontFamily: "Inter-SemiBold",
+    fontSize: 16,
+    color: "#007BFF", // iOS style blue link
+  },
+  alertCancelBtn: {
+    paddingVertical: 16,
+    alignItems: "center",
+  },
+  alertCancelText: {
+    fontFamily: "Inter-SemiBold",
+    fontSize: 16,
+    color: "#FF3B30", // Red text for cancel
   },
 });

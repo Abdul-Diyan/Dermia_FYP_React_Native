@@ -1,4 +1,5 @@
 import BottomTabNavigation from "@/components/bottom-tab-navigation";
+import GradientHeader from "@/components/gradient-header";
 import { router, useLocalSearchParams } from "expo-router";
 import {
   addDoc,
@@ -14,14 +15,13 @@ import {
   ActivityIndicator,
   Alert,
   Image,
-  Pressable,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   useColorScheme,
   useWindowDimensions,
-  View,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../config/firebaseConfig";
@@ -139,17 +139,7 @@ export default function StartDiagnosisPage() {
         barStyle={topBarTextStyle}
       />
       <View style={styles.container}>
-        <View style={styles.headerSection}>
-          <Pressable style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backIcon}>←</Text>
-          </Pressable>
-          <Text
-            style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
-          >
-            Diagnosis Report
-          </Text>
-          <View style={{ width: 50 }} />
-        </View>
+        <GradientHeader title="Diagnosis Report" showBackArrow isSmallScreen={isSmallScreen} />
 
         {isAnalyzing || !reportData ? (
           <View style={styles.loadingContainer}>
@@ -277,9 +267,13 @@ const styles = StyleSheet.create({
   },
   reportIdText: {
     fontSize: 14,
+
+    fontFamily: 'Inter-Regular',
     color: "#333333",
   },
   reportIdValue: {
+
+    fontFamily: 'Inter-SemiBold',
     color: "#0a73ff",
   },
   mainCard: {
@@ -291,19 +285,23 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 14,
+
+    fontFamily: 'Inter-Regular',
     color: "#333333",
     marginBottom: 6,
   },
   sectionTitle: {
     fontSize: 22,
-    fontWeight: "bold",
+
+    fontFamily: 'Inter-SemiBold',
     color: "#0a73ff",
     marginTop: 12,
     marginBottom: 12,
   },
   sectionTitleSmall: {
     fontSize: 16,
-    fontWeight: "bold",
+
+    fontFamily: 'Inter-SemiBold',
     color: "#0a73ff",
     marginTop: 16,
     marginBottom: 8,
@@ -312,9 +310,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#333333",
     marginBottom: 8,
+
+    fontFamily: 'Inter-Regular',
   },
   infoValue: {
-    fontWeight: "bold",
+
+    fontFamily: 'Inter-SemiBold',
     color: "#0a73ff",
   },
   heatmapContainer: {
@@ -339,6 +340,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#333333",
     lineHeight: 22,
+
+    fontFamily: 'Inter-Regular',
   },
   explanationTextSmall: {
     fontSize: 12,
@@ -353,13 +356,15 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 20,
     fontSize: 18,
-    fontWeight: "600",
+    fontFamily: 'Inter-SemiBold',
     color: "#333333",
   },
   loadingSubtext: {
     marginTop: 8,
     fontSize: 14,
     color: "#666666",
+
+    fontFamily: 'Inter-Regular',
   },
   uploadedImageContainer: {
     marginBottom: 20,
