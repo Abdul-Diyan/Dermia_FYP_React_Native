@@ -382,9 +382,6 @@ const styles = StyleSheet.create({
   emptyTextSmall: {
     fontSize: 14,
   },
-  emptyTextSmall: {
-    fontSize: 14,
-  },
   // Custom Modal Styles added below
   modalOverlay: {
     flex: 1,
