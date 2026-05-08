@@ -2,29 +2,29 @@ import BottomTabNavigation from "@/components/bottom-tab-navigation";
 import GradientHeader from "@/components/gradient-header";
 import { router } from "expo-router";
 import {
-  collection,
-  doc,
-  getDocs,
-  limit,
-  orderBy,
-  query,
-  writeBatch,
+    collection,
+    doc,
+    getDocs,
+    limit,
+    orderBy,
+    query,
+    writeBatch,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  Image,
-  Modal,
-  Pressable,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  useWindowDimensions,
-  View,
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    Image,
+    Modal,
+    Pressable,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    useColorScheme,
+    useWindowDimensions,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../config/firebaseConfig";
@@ -72,24 +72,18 @@ export default function ReportCatalogPage() {
   }, []);
 
   const handleClearHistory = () => {
-    setClearModalVisible(true); // Just opens the modal now
+    setClearModalVisible(true);
   };
 
   const confirmClearHistory = async () => {
-    setClearModalVisible(false); // Close modal immediately for snappy UI
+    setClearModalVisible(false);
     try {
       const user = auth.currentUser;
       if (!user) return;
 
       const batch = writeBatch(db);
       reports.forEach((report) => {
-        const reportRef = doc(
-          db,
-          "users",
-          user.uid,
-          "reports",
-          report.id,
-        );
+        const reportRef = doc(db, "users", user.uid, "reports", report.id);
         batch.delete(reportRef);
       });
 
@@ -144,45 +138,14 @@ export default function ReportCatalogPage() {
           showBackArrow
           isSmallScreen={isSmallScreen}
         />
-        {/* <LinearGradient
-
-          colors={["#3b94ff", "#004dcc"]}  // Updated to app standard gradient
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
-          style={styles.headerSection}
-        >
-          <View style={styles.headerSideContainer}>
-            <Pressable style={styles.backButton} onPress={() => router.back()}>
-              <Text style={styles.backIcon}>←</Text>
-            </Pressable>
-          </View>
-
-          <Text
-            style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
-          >
-            Report History
-          </Text>
-
-          <View style={[styles.headerSideContainer, { alignItems: 'flex-end' }]}>
-            <Pressable style={styles.clearButton} onPress={handleClearHistory}>
-              <Text
-                style={[
-                  styles.clearButtonText,
-                  isSmallScreen && styles.clearButtonTextSmall,
-                ]}
-              >
-                Clear History
-              </Text>
-            </Pressable>
-          </View>
-        </LinearGradient> */}
-
         <ScrollView
           style={styles.scrollContainer}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <View style={{ alignItems: 'flex-end', width: '100%', marginBottom: 15 }}>
+          <View
+            style={{ alignItems: "flex-end", width: "100%", marginBottom: 15 }}
+          >
             <Pressable style={styles.clearButton} onPress={handleClearHistory}>
               <Text
                 style={[
@@ -197,7 +160,7 @@ export default function ReportCatalogPage() {
           {isLoading ? (
             <ActivityIndicator
               size="large"
-              color="#007BFF" // Updated loader color
+              color="#007BFF"
               style={{ marginTop: 50 }}
             />
           ) : reports.length > 0 ? (
@@ -225,7 +188,6 @@ export default function ReportCatalogPage() {
           )}
         </ScrollView>
 
-        {/* Custom Confirmation Modal */}
         <Modal
           visible={isClearModalVisible}
           transparent={true}
@@ -235,7 +197,9 @@ export default function ReportCatalogPage() {
           <View style={styles.modalOverlay}>
             <View style={styles.customAlertBox}>
               <Text style={styles.alertTitle}>Clear History</Text>
-              <Text style={styles.alertMessage}>Are you sure you want to delete these reports?</Text>
+              <Text style={styles.alertMessage}>
+                Are you sure you want to delete these reports?
+              </Text>
 
               <View style={styles.alertButtonGroup}>
                 <Pressable
@@ -259,7 +223,6 @@ export default function ReportCatalogPage() {
         <BottomTabNavigation isSmallScreen={isSmallScreen} />
       </View>
     </SafeAreaView>
-
   );
 }
 
@@ -279,14 +242,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   headerSideContainer: {
-    width: 100, // Locks both sides to 100px so the middle is dead-center
-    justifyContent: 'center',
+    width: 100,
+    justifyContent: "center",
   },
   backButton: {
     width: 50,
     height: 50,
     justifyContent: "center",
-    alignItems: "flex-start", // Push icon to the left edge of the container
+    alignItems: "flex-start",
   },
   backIcon: {
     fontSize: 32,
@@ -296,7 +259,7 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 24,
 
-    fontFamily: 'Inter-Bold',
+    fontFamily: "Inter-Bold",
     color: "#FFFFFF",
     letterSpacing: 0.5,
     flex: 1,
@@ -311,8 +274,8 @@ const styles = StyleSheet.create({
   clearButtonText: {
     fontSize: 14,
 
-    fontFamily: 'Inter-SemiBold',
-    color: "#FF8888", // Lightened red so it passes contrast checks on blue
+    fontFamily: "Inter-SemiBold",
+    color: "#FF8888",
   },
   clearButtonTextSmall: {
     fontSize: 12,
@@ -337,7 +300,7 @@ const styles = StyleSheet.create({
   reportCard: {
     backgroundColor: "#FFFFFF",
     borderWidth: 2,
-    borderColor: "#007BFF", // Match unified app blue
+    borderColor: "#007BFF",
     borderRadius: 12,
     justifyContent: "flex-start",
     alignItems: "center",
@@ -355,7 +318,7 @@ const styles = StyleSheet.create({
   },
   reportTitle: {
     fontSize: 16,
-    fontFamily: 'Inter-SemiBold',
+    fontFamily: "Inter-SemiBold",
     color: "#333333",
     textAlign: "center",
   },
@@ -365,7 +328,7 @@ const styles = StyleSheet.create({
   reportDate: {
     fontSize: 12,
 
-    fontFamily: 'Inter-Regular',
+    fontFamily: "Inter-Regular",
     color: "#666666",
     marginTop: 4,
   },
@@ -382,10 +345,10 @@ const styles = StyleSheet.create({
   emptyTextSmall: {
     fontSize: 14,
   },
-  // Custom Modal Styles added below
+
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Dark semi-transparent background
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -430,7 +393,7 @@ const styles = StyleSheet.create({
   alertActionTextDestructive: {
     fontFamily: "Inter-SemiBold",
     fontSize: 16,
-    color: "#FF3B30", // Red text for destructive action
+    color: "#FF3B30",
   },
   alertCancelBtn: {
     paddingVertical: 16,
@@ -439,6 +402,6 @@ const styles = StyleSheet.create({
   alertCancelText: {
     fontFamily: "Inter-SemiBold",
     fontSize: 16,
-    color: "#007BFF", // Standard blue for safe cancel action
+    color: "#007BFF",
   },
 });

@@ -56,27 +56,6 @@ export default function UserProfilePage() {
         barStyle={topBarTextStyle}
       />
       <View style={styles.container}>
-        {/* <LinearGradient
-                          colors={["#3b94ff", "#004dcc"]} // Light left, dark right
-                          start={{ x: 0, y: 0.5 }}
-                          end={{ x: 1, y: 0.5 }}
-                          style={styles.headerSection}
-                        >
-                            <Pressable style={styles.backButton} onPress={() => router.back()}>
-                    <Text style={styles.backIcon}>←</Text>
-                  </Pressable>
-                          <Text
-                            style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
-                          >
-                           Profile
-                          </Text>
-                          <Pressable
-            style={styles.editButton}
-            onPress={() => setIsEditing(!isEditing)}
-          >
-            <Text style={styles.editIcon}>{isEditing ? "✓" : "✏"}</Text>
-          </Pressable>
-                </LinearGradient> */}
         <GradientHeader
           title="User Profile"
           showBackArrow
@@ -88,7 +67,6 @@ export default function UserProfilePage() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Reset Password Link */}
           <Pressable
             style={styles.linkWrapper}
             onPress={() => router.push("/forgetpassword_page")}
@@ -98,7 +76,6 @@ export default function UserProfilePage() {
             </Text>
           </Pressable>
 
-          {/* Logout Link */}
           <Pressable style={styles.linkWrapper} onPress={handleLogout}>
             <Text style={[styles.linkText, styles.logoutText]}>Log out</Text>
           </Pressable>
@@ -119,7 +96,7 @@ const styles = StyleSheet.create({
     marginBottom: 80,
   },
   scrollContent: {
-    paddingHorizontal: 40, // Aligns text to the left with margin as seen in image_0a7f4d.png
+    paddingHorizontal: 40,
     paddingVertical: 40,
   },
   linkWrapper: {
@@ -137,7 +114,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   logoutText: {
-    color: "#FF0000", // Matches the red logout text in image_0a7f4d.png
+    color: "#FF0000",
   },
   container: {
     flex: 1,

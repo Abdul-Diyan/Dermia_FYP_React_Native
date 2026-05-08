@@ -31,16 +31,12 @@ export default function GradientHeader({
       )}
 
       <Text
-        style={[
-          styles.headerText,
-          isSmallScreen && styles.headerTextSmall,
-        ]}
+        style={[styles.headerText, isSmallScreen && styles.headerTextSmall]}
         numberOfLines={1}
       >
         {title}
       </Text>
 
-      {/* Right spacer to keep title centered */}
       <View style={styles.spacer} />
     </LinearGradient>
   );
@@ -71,7 +67,7 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 22,
 
-    fontFamily: 'Inter-SemiBold',
+    fontFamily: "Inter-SemiBold",
     color: "#FFFFFF",
     letterSpacing: 0.5,
     flex: 1,

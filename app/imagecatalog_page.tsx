@@ -3,29 +3,29 @@ import GradientHeader from "@/components/gradient-header";
 import * as ImagePicker from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
 import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  orderBy,
-  query,
-  serverTimestamp,
+    addDoc,
+    collection,
+    deleteDoc,
+    doc,
+    getDocs,
+    orderBy,
+    query,
+    serverTimestamp,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  Image,
-  Pressable,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  useWindowDimensions,
-  View,
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    Image,
+    Pressable,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    useColorScheme,
+    useWindowDimensions,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../config/firebaseConfig";
@@ -199,8 +199,8 @@ export default function ImageCatalogPage() {
         styles.imageItem,
         { width: itemSize, height: itemSize },
         selectedImageId === item.id &&
-        mode !== "manage" &&
-        styles.imageItemSelected,
+          mode !== "manage" &&
+          styles.imageItemSelected,
       ]}
       onPress={() => handleImagePress(item)}
     >
@@ -256,18 +256,24 @@ export default function ImageCatalogPage() {
             ) : (
               <>
                 <FlatList
-                  data={[...images, { id: 'add-button', isAdd: true }]} // Append the button to the data
+                  data={[...images, { id: "add-button", isAdd: true }]}
                   renderItem={({ item }) => {
                     if (item.isAdd) {
                       return (
-                        <View style={{ width: itemSize, alignItems: 'center', justifyContent: 'center' }}>
+                        <View
+                          style={{
+                            width: itemSize,
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
                           <Pressable
                             style={[
                               styles.addButton,
                               {
                                 width: 72,
                                 height: 72,
-                                borderRadius: 36 // Half of 72 for a perfect circle
+                                borderRadius: 36,
                               },
                             ]}
                             onPress={pickAndUploadImage}
@@ -289,20 +295,6 @@ export default function ImageCatalogPage() {
                   scrollEnabled={false}
                   columnWrapperStyle={styles.columnWrapper}
                 />
-                {/* <Pressable
-                  style={[
-                    styles.addButton,
-                    { width: itemSize, height: itemSize },
-                  ]}
-                  onPress={pickAndUploadImage}
-                  disabled={isUploading}
-                >
-                  {isUploading ? (
-                    <ActivityIndicator color="#FFFFFF" size="large" />
-                  ) : (
-                    <Text style={styles.addButtonText}>+</Text>
-                  )}
-                </Pressable> */}
               </>
             )}
           </View>
@@ -374,7 +366,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#0a73ff",
     justifyContent: "center",
     alignItems: "center",
-    // Elevation/Shadow to make the circle pop (optional)
     elevation: 2,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -382,15 +373,14 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
   },
   addButtonText: {
-    fontSize: 58, // Adjusted for a 72px circle
+    fontSize: 58,
     color: "#FFFFFF",
 
-    fontFamily: 'Inter-Bold',
-    marginTop: -4, // Optical centering: helps the '+' look perfectly centered
+    fontFamily: "Inter-Bold",
+    marginTop: -4,
   },
 
   columnWrapper: {
-    // Removed flexWrap: "wrap" because FlatList handles wrapping via numColumns
     justifyContent: "flex-start",
     gap: 15,
     marginBottom: 16,
@@ -408,7 +398,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#E8B4B8",
   },
-
 
   buttonContainer: {
     position: "absolute",
@@ -440,7 +429,7 @@ const styles = StyleSheet.create({
   doneButtonText: {
     fontSize: 20,
 
-    fontFamily: 'Inter-Bold',
+    fontFamily: "Inter-Bold",
     color: "#FFFFFF",
     letterSpacing: 0.5,
   },

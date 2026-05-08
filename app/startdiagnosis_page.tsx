@@ -2,26 +2,26 @@ import BottomTabNavigation from "@/components/bottom-tab-navigation";
 import GradientHeader from "@/components/gradient-header";
 import { router, useLocalSearchParams } from "expo-router";
 import {
-  addDoc,
-  collection,
-  getDocs,
-  limit,
-  query,
-  serverTimestamp,
-  where,
+    addDoc,
+    collection,
+    getDocs,
+    limit,
+    query,
+    serverTimestamp,
+    where,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  useWindowDimensions,
-  View
+    ActivityIndicator,
+    Alert,
+    Image,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    useColorScheme,
+    useWindowDimensions,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../config/firebaseConfig";
@@ -74,9 +74,6 @@ export default function StartDiagnosisPage() {
 
         console.log("No previous report found. Sending to Python ML Engine...");
 
-        // Using your actual laptop IP address!
-        //const backendUrl = "http://192.168.1.14:5000/predict";
-        //const backendUrl = "https://young-cats-notice.loca.lt/predict"
         const fetchUrl = `${BACKEND_URL}/predict`;
 
         const response = await fetch(fetchUrl, {
@@ -108,11 +105,12 @@ export default function StartDiagnosisPage() {
 
         console.log("Success: Real ML report with XAI saved to Firestore!");
 
-        // setReportData({ ...newReport, reportId: docRef.id });
         setReportData({
           ...newReport,
           reportId: docRef.id,
-          displayHeatmap: mlData.gradcam_image ? `data:image/jpeg;base64,${mlData.gradcam_image}` : null
+          displayHeatmap: mlData.gradcam_image
+            ? `data:image/jpeg;base64,${mlData.gradcam_image}`
+            : null,
         });
         setIsAnalyzing(false);
       } catch (error: any) {
@@ -141,7 +139,11 @@ export default function StartDiagnosisPage() {
         barStyle={topBarTextStyle}
       />
       <View style={styles.container}>
-        <GradientHeader title="Diagnosis Report" showBackArrow isSmallScreen={isSmallScreen} />
+        <GradientHeader
+          title="Diagnosis Report"
+          showBackArrow
+          isSmallScreen={isSmallScreen}
+        />
 
         {isAnalyzing || !reportData ? (
           <View style={styles.loadingContainer}>
@@ -167,7 +169,6 @@ export default function StartDiagnosisPage() {
             </View>
 
             <View style={styles.mainCard}>
-              {/* Meta Info */}
               <Text style={styles.metaText}>Date: {reportData.date}</Text>
               <Text style={styles.metaText}>
                 Image ID: {reportData.imageId}
@@ -195,7 +196,10 @@ export default function StartDiagnosisPage() {
               <View style={styles.heatmapContainer}>
                 <Image
                   source={{
-                    uri: reportData.displayHeatmap || reportData.heatmapUrl || reportData.imageUrl,
+                    uri:
+                      reportData.displayHeatmap ||
+                      reportData.heatmapUrl ||
+                      reportData.imageUrl,
                   }}
                   style={styles.heatmapImage}
                   resizeMode="cover"
@@ -204,7 +208,8 @@ export default function StartDiagnosisPage() {
               <Text style={styles.sectionTitleSmall}>Explanation</Text>
               <View style={styles.explanationBox}>
                 <Text style={styles.explanationText}>
-                  {reportData.xaiReport || "Detailed analysis is currently unavailable for this report."}
+                  {reportData.xaiReport ||
+                    "Detailed analysis is currently unavailable for this report."}
                 </Text>
               </View>
             </View>
@@ -270,12 +275,11 @@ const styles = StyleSheet.create({
   reportIdText: {
     fontSize: 14,
 
-    fontFamily: 'Inter-Regular',
+    fontFamily: "Inter-Regular",
     color: "#333333",
   },
   reportIdValue: {
-
-    fontFamily: 'Inter-SemiBold',
+    fontFamily: "Inter-SemiBold",
     color: "#0a73ff",
   },
   mainCard: {
@@ -288,14 +292,14 @@ const styles = StyleSheet.create({
   metaText: {
     fontSize: 14,
 
-    fontFamily: 'Inter-Regular',
+    fontFamily: "Inter-Regular",
     color: "#333333",
     marginBottom: 6,
   },
   sectionTitle: {
     fontSize: 22,
 
-    fontFamily: 'Inter-SemiBold',
+    fontFamily: "Inter-SemiBold",
     color: "#0a73ff",
     marginTop: 12,
     marginBottom: 12,
@@ -303,7 +307,7 @@ const styles = StyleSheet.create({
   sectionTitleSmall: {
     fontSize: 16,
 
-    fontFamily: 'Inter-SemiBold',
+    fontFamily: "Inter-SemiBold",
     color: "#0a73ff",
     marginTop: 16,
     marginBottom: 8,
@@ -313,11 +317,10 @@ const styles = StyleSheet.create({
     color: "#333333",
     marginBottom: 8,
 
-    fontFamily: 'Inter-Regular',
+    fontFamily: "Inter-Regular",
   },
   infoValue: {
-
-    fontFamily: 'Inter-SemiBold',
+    fontFamily: "Inter-SemiBold",
     color: "#0a73ff",
   },
   heatmapContainer: {
@@ -343,7 +346,7 @@ const styles = StyleSheet.create({
     color: "#333333",
     lineHeight: 22,
 
-    fontFamily: 'Inter-Regular',
+    fontFamily: "Inter-Regular",
   },
   explanationTextSmall: {
     fontSize: 12,
@@ -358,7 +361,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 20,
     fontSize: 18,
-    fontFamily: 'Inter-SemiBold',
+    fontFamily: "Inter-SemiBold",
     color: "#333333",
   },
   loadingSubtext: {
@@ -366,7 +369,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666666",
 
-    fontFamily: 'Inter-Regular',
+    fontFamily: "Inter-Regular",
   },
   uploadedImageContainer: {
     marginBottom: 20,

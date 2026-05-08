@@ -1,16 +1,16 @@
-import { LinearGradient } from "expo-linear-gradient"; // Import LinearGradient
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React from "react";
 import {
-  Image, // Added for consistent font rendering if needed
-  Pressable,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  useWindowDimensions,
-  View
+    Image,
+    Pressable,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    useColorScheme,
+    useWindowDimensions,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -40,11 +40,11 @@ const LandingPage = () => {
       >
         {/* Replaced View with LinearGradient */}
         <LinearGradient
-          colors={["#4EA1FF", "#0077FF"]} // Updated to your exact Figma colors
+          colors={["#4EA1FF", "#0077FF"]}
           style={[
             styles.headerSection,
             {
-              height: 302, // Exact height from Figma
+              height: 302,
               width: "100%",
             },
           ]}
@@ -61,9 +61,9 @@ const LandingPage = () => {
             <Image
               source={require("@/assets/images/doctors-illustration.png")}
               style={{
-                width: 184, // Figma width
-                height: 147, // Figma height
-                resizeMode: "contain"
+                width: 184,
+                height: 147,
+                resizeMode: "contain",
               }}
             />
           </View>
@@ -118,14 +118,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
-    borderBottomLeftRadius: 30, // Figma radius
-    borderBottomRightRadius: 30, // Figma radius
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
     overflow: "hidden",
   },
   button: {
-    backgroundColor: "#3895FF", // Figma button color
-    width: 215, // Figma size
-    height: 88, // Figma size
+    backgroundColor: "#3895FF",
+    width: 215,
+    height: 88,
     borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
-    marginTop: 40, // Adjusts Y-axis positioning roughly to Figma specs
+    marginTop: 40,
   },
 
   container: {

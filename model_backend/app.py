@@ -226,10 +226,7 @@ for name in model_names:
         print(f"❌ CRITICAL ERROR loading {name}: {str(e)}")
 print(f"================ MODEL LOADING END. Total loaded: {len(models_dict)} ================")
 
-# =============================================================================
-# DERMIA concept model Loading
-# =============================================================================
-DERMIA_CHECKPOINT = 'models/dermia_v2_best.pth' # Assuming it is in your models folder
+DERMIA_CHECKPOINT = 'models/dermia_v2_best.pth'
 dermia_model      = None
 dermia_W          = None
 
@@ -245,9 +242,6 @@ except Exception as e:
     print(f"❌ WARNING: concept model not loaded: {e}")
     print(f"           XAI textual explanations will be unavailable.")
 
-# =============================================================================
-# XAI - Structural Concept Computation & Report Helpers
-# =============================================================================
 def compute_structural_concepts(pil_image):
     img  = np.array(pil_image.convert('RGB'))
     gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
@@ -398,9 +392,6 @@ def generate_xai_report(concept_scores, ensemble_probs, ensemble_pred_idx, ensem
     lines.append(thin)
     lines.append("  DERMOSCOPIC FINDINGS\n")
 
-    # -------------------------------------------------------------------------
-    # Assemble trimmed report (Dermoscopic Findings Only)
-    # -------------------------------------------------------------------------
     lines = []
 
     if present_confirming or absent_confirming or struct_findings:
@@ -547,7 +538,6 @@ def predict():
                 heatmap_url = upload_result.get("secure_url")
             except Exception as cloud_err:
                 print(f"Cloudinary upload failed: {cloud_err}")
-                # Fallback: If cloud fails, you could still return base64 if needed
 
         xai_report = None
         if dermia_model is not None and dermia_W is not None:
@@ -573,12 +563,11 @@ def predict():
             except Exception as xai_err:
                 print(f"[xai] report generation failed: {xai_err}")
 
-        # --- UPDATED RESPONSE ---
         return jsonify({
             'diagnosis': LABELS[prediction_idx],
             'confidence': float(f"{confidence:.4f}"),
             'prediction_index': prediction_idx,
-            'heatmapImageURL': heatmap_url, # Now returning a Cloudinary URL
+            'heatmapImageURL': heatmap_url,
             'xai_report': xai_report
         })
 

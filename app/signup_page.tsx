@@ -1,18 +1,18 @@
-import { LinearGradient } from "expo-linear-gradient"; // Use LinearGradient as requested
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import {
-  Alert,
-  Pressable,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  useColorScheme,
-  useWindowDimensions,
-  View
+    Alert,
+    Pressable,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TextInput,
+    useColorScheme,
+    useWindowDimensions,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../config/firebaseConfig";
@@ -69,24 +69,27 @@ export default function SignupPage() {
         bounces={false}
         showsHorizontalScrollIndicator={false}
       >
-        {/* Header Section */}
         <LinearGradient
-          colors={["#57A6FF", "#006BE6"]} // Exact colors from image
+          colors={["#57A6FF", "#006BE6"]}
           style={styles.headerSection}
         >
-          <Text style={[styles.titleText, isSmallScreen && styles.titleTextSmall]}>
+          <Text
+            style={[styles.titleText, isSmallScreen && styles.titleTextSmall]}
+          >
             Sign up
           </Text>
-          <Text style={[styles.headerSubtitleText, isSmallScreen && styles.headerSubtitleTextSmall]}>
+          <Text
+            style={[
+              styles.headerSubtitleText,
+              isSmallScreen && styles.headerSubtitleTextSmall,
+            ]}
+          >
             Create a new Account
           </Text>
         </LinearGradient>
 
-        {/* Modal Section */}
         <View style={styles.formContainer}>
-          {/* Inner wrapper locks inputs to 236px width inside the 352px modal */}
           <View style={styles.formInner}>
-
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
                 Email
@@ -152,22 +155,36 @@ export default function SignupPage() {
               ]}
               onPress={handleSignup}
             >
-              <Text style={[styles.signupButtonText, isSmallScreen && styles.signupButtonTextSmall]}>
+              <Text
+                style={[
+                  styles.signupButtonText,
+                  isSmallScreen && styles.signupButtonTextSmall,
+                ]}
+              >
                 Sign up
               </Text>
             </Pressable>
 
             <View style={styles.loginContainer}>
-              <Text style={[styles.loginText, isSmallScreen && styles.loginTextSmall]}>
+              <Text
+                style={[
+                  styles.loginText,
+                  isSmallScreen && styles.loginTextSmall,
+                ]}
+              >
                 Already have an account ?{" "}
               </Text>
               <Pressable onPress={() => router.push("/login_page")}>
-                <Text style={[styles.loginLink, isSmallScreen && styles.loginLinkSmall]}>
+                <Text
+                  style={[
+                    styles.loginLink,
+                    isSmallScreen && styles.loginLinkSmall,
+                  ]}
+                >
                   Login
                 </Text>
               </Pressable>
             </View>
-
           </View>
         </View>
       </ScrollView>
@@ -181,7 +198,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "#F8F9FA", // Use a light gray to match the shadow depth in image_3.png
+    backgroundColor: "#F8F9FA",
   },
   contentContainer: {
     flexGrow: 1,
@@ -193,9 +210,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
-    borderBottomLeftRadius: 10,  // Figma Spec
-    borderBottomRightRadius: 10, // Figma Spec
-    height: 395,                 // Figma Spec
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    height: 395,
     width: "100%",
   },
   titleText: {
@@ -213,7 +230,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "#FFFFFF",
     letterSpacing: 0.3,
-    marginTop: 20, // Increase this value to push the subtitle further down!
+    marginTop: 20,
   },
   headerSubtitleTextSmall: {
     fontSize: 16,
@@ -221,10 +238,10 @@ const styles = StyleSheet.create({
   formContainer: {
     backgroundColor: "#FFFFFF",
     borderRadius: 20,
-    width: 352, // Figma Spec
-    marginTop: -100, // Overlaps the blue header
+    width: 352,
+    marginTop: -100,
     paddingVertical: 40,
-    alignItems: "center", // Centers the formInner
+    alignItems: "center",
     elevation: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
@@ -232,7 +249,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
   },
   formInner: {
-    width: 236, // Figma Spec (Input/Button width)
+    width: 236,
   },
   inputGroup: {
     marginBottom: 20,
@@ -256,7 +273,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#333",
     fontWeight: "500",
-    width: "100%", // Takes full width of the 236px formInner
+    width: "100%",
   },
   inputSmall: {
     paddingVertical: 12,
@@ -271,7 +288,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 24,
     marginTop: 10,
-    width: "100%", // Takes full width of the 236px formInner
+    width: "100%",
   },
   signupButtonSmall: {
     paddingVertical: 14,
@@ -279,7 +296,7 @@ const styles = StyleSheet.create({
   },
   signupButtonText: {
     fontSize: 18,
-    fontFamily: 'Inter-Bold',
+    fontFamily: "Inter-Bold",
     color: "#FFFFFF",
   },
   signupButtonTextSmall: {
@@ -293,9 +310,8 @@ const styles = StyleSheet.create({
   loginText: {
     fontSize: 12,
 
-    fontFamily: 'Inter-SemiBold',
+    fontFamily: "Inter-SemiBold",
     color: "#111",
-
   },
   loginTextSmall: {
     fontSize: 11,
@@ -304,7 +320,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#007BFF",
 
-    fontFamily: 'Inter-SemiBold',
+    fontFamily: "Inter-SemiBold",
   },
   loginLinkSmall: {
     fontSize: 11,

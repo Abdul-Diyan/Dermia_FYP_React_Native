@@ -3,16 +3,16 @@ import { router } from "expo-router";
 import { sendPasswordResetEmail } from "firebase/auth";
 import React, { useState } from "react";
 import {
-  Alert,
-  Pressable,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  useColorScheme,
-  useWindowDimensions,
-  View
+    Alert,
+    Pressable,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TextInput,
+    useColorScheme,
+    useWindowDimensions,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../config/firebaseConfig";
@@ -73,9 +73,8 @@ export default function ForgetPasswordPage() {
         bounces={false}
         showsHorizontalScrollIndicator={false}
       >
-        {/* Header Section */}
         <LinearGradient
-          colors={["#57A6FF", "#006BE6"]} // Exact colors from image
+          colors={["#57A6FF", "#006BE6"]}
           style={styles.headerSection}
         >
           <View style={styles.textContainer}>
@@ -98,9 +97,7 @@ export default function ForgetPasswordPage() {
           </View>
         </LinearGradient>
 
-        {/* Modal Section */}
         <View style={styles.formContainer}>
-          {/* Inner wrapper to lock inputs to 236px width inside the 352px modal */}
           <View style={styles.formInner}>
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isSmallScreen && styles.labelSmall]}>
@@ -155,9 +152,9 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   textContainer: {
-    width: "100%", // Let the container take full width
+    width: "100%",
     marginTop: -40,
-    alignItems: "center", // Centers the title
+    alignItems: "center",
   },
   titleText: {
     fontFamily: "Inter-Bold",
@@ -165,7 +162,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     letterSpacing: 0.5,
     marginBottom: 24,
-    textAlign: "center", // Ensures the main title is perfectly centered
+    textAlign: "center",
   },
   titleTextSmall: {
     fontSize: 34,
@@ -178,15 +175,15 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
     lineHeight: 28,
     textAlign: "left",
-    width: 236, // Locks the subtitle width so it wraps exactly like the image
-    marginLeft: 30, // Pushes the subtitle text block slightly to the right
+    width: 236,
+    marginLeft: 30,
   },
   headerSection: {
     justifyContent: "center",
     alignItems: "center",
-    borderBottomLeftRadius: 10,  // Figma Spec
-    borderBottomRightRadius: 10, // Figma Spec
-    height: 395,                 // Figma Spec
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    height: 395,
     width: "100%",
   },
 
@@ -197,10 +194,10 @@ const styles = StyleSheet.create({
   formContainer: {
     backgroundColor: "#FFFFFF",
     borderRadius: 20,
-    width: 352, // Figma Spec
-    marginTop: -100, // Overlaps the blue header
+    width: 352,
+    marginTop: -100,
     paddingVertical: 40,
-    alignItems: "center", // Centers the formInner
+    alignItems: "center",
     elevation: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
@@ -208,7 +205,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
   },
   formInner: {
-    width: 236, // Figma Spec (Input/Button width)
+    width: 236,
   },
   inputGroup: {
     marginBottom: 32,
@@ -231,7 +228,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     fontSize: 14,
     color: "#333333",
-    width: "100%", // Takes full width of the 236px formInner
+    width: "100%",
   },
   inputSmall: {
     paddingVertical: 12,
@@ -244,7 +241,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
-    width: "100%", // Takes full width of the 236px formInner
+    width: "100%",
   },
   resetButtonSmall: {
     paddingVertical: 14,

@@ -1,13 +1,13 @@
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import {
-  Inter_400Regular,
-  Inter_600SemiBold,
-  Inter_700Bold
+    Inter_400Regular,
+    Inter_600SemiBold,
+    Inter_700Bold,
 } from "@expo-google-fonts/inter";
 import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
+    DarkTheme,
+    DefaultTheme,
+    ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
@@ -23,7 +23,6 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
-
   const colorScheme = useColorScheme();
 
   const [fontsLoaded, error] = useFonts({
@@ -39,7 +38,7 @@ export default function RootLayout() {
   }, [fontsLoaded, error]);
 
   if (!fontsLoaded && !error) {
-    return null; // Keep the splash screen visible while fonts load
+    return null;
   }
 
   return (
