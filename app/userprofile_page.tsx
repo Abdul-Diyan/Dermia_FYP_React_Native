@@ -4,15 +4,15 @@ import { router } from "expo-router";
 import { signOut } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
-  Pressable,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  useWindowDimensions,
-  View
+    Alert,
+    Pressable,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    useColorScheme,
+    useWindowDimensions,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../config/firebaseConfig";
@@ -93,14 +93,13 @@ export default function UserProfilePage() {
             style={styles.linkWrapper}
             onPress={() => router.push("/forgetpassword_page")}
           >
-            <Text style={[styles.linkText, styles.resetText]}>Reset Password</Text>
+            <Text style={[styles.linkText, styles.resetText]}>
+              Reset Password
+            </Text>
           </Pressable>
 
           {/* Logout Link */}
-          <Pressable
-            style={styles.linkWrapper}
-            onPress={handleLogout}
-          >
+          <Pressable style={styles.linkWrapper} onPress={handleLogout}>
             <Text style={[styles.linkText, styles.logoutText]}>Log out</Text>
           </Pressable>
         </ScrollView>
@@ -125,12 +124,12 @@ const styles = StyleSheet.create({
   },
   linkWrapper: {
     paddingVertical: 15,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   linkText: {
     fontSize: 20,
 
-    fontFamily: 'Inter-SemiBold',
+    fontFamily: "Inter-SemiBold",
     letterSpacing: 0.3,
   },
   resetText: {
