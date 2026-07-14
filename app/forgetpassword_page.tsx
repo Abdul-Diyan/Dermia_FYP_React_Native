@@ -3,16 +3,16 @@ import { router } from "expo-router";
 import { sendPasswordResetEmail } from "firebase/auth";
 import React, { useState } from "react";
 import {
-    Alert,
-    Pressable,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    useColorScheme,
-    useWindowDimensions,
-    View,
+  Alert,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  useColorScheme,
+  useWindowDimensions,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../config/firebaseConfig";
@@ -42,7 +42,7 @@ export default function ForgetPasswordPage() {
         "Check your inbox for a link to reset your password.",
       );
 
-      router.push("/login_page");
+      router.replace("/login_page");
     } catch (error: any) {
       if (error.code === "auth/invalid-email") {
         Alert.alert(

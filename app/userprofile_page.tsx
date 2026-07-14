@@ -4,15 +4,15 @@ import { router } from "expo-router";
 import { signOut } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import {
-    Alert,
-    Pressable,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    useColorScheme,
-    useWindowDimensions,
-    View,
+  Alert,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  useWindowDimensions,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../config/firebaseConfig";
@@ -41,7 +41,8 @@ export default function UserProfilePage() {
     try {
       await signOut(auth);
       console.log("User logged out successfully");
-      router.push("/landing_page");
+      router.dismissAll();
+      router.replace("/landing_page");
     } catch (error: any) {
       console.error("Logout error:", error);
       Alert.alert("Logout Failed", error.message);

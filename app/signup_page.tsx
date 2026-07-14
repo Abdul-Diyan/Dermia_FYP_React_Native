@@ -3,16 +3,16 @@ import { router } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import {
-    Alert,
-    Pressable,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    useColorScheme,
-    useWindowDimensions,
-    View,
+  Alert,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  useColorScheme,
+  useWindowDimensions,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../config/firebaseConfig";
@@ -49,7 +49,7 @@ export default function SignupPage() {
       console.log("Registered:", userCredential.user.email);
       Alert.alert("Success!", "Account created successfully.");
 
-      router.push("/login_page");
+      router.replace("/login_page");
     } catch (error: any) {
       console.error(error);
       Alert.alert("Signup Failed", error.message);

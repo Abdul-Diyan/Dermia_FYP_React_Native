@@ -2,15 +2,15 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React from "react";
 import {
-    Image,
-    Pressable,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    useColorScheme,
-    useWindowDimensions,
-    View,
+  Image,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  useWindowDimensions,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -89,7 +89,7 @@ const LandingPage = () => {
                 { maxWidth: width * 0.85 },
               ]}
               onPress={() => {
-                router.push("/login_page");
+                router.replace("/login_page");
               }}
             >
               <Text

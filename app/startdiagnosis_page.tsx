@@ -2,30 +2,30 @@ import BottomTabNavigation from "@/components/bottom-tab-navigation";
 import GradientHeader from "@/components/gradient-header";
 import { router, useLocalSearchParams } from "expo-router";
 import {
-    addDoc,
-    collection,
-    getDocs,
-    limit,
-    query,
-    serverTimestamp,
-    where,
+  addDoc,
+  collection,
+  getDocs,
+  limit,
+  query,
+  serverTimestamp,
+  where,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    useColorScheme,
-    useWindowDimensions,
-    View,
+  ActivityIndicator,
+  Alert,
+  Image,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  useWindowDimensions,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../config/firebaseConfig";
-import { BACKEND_URL } from "../constants/apiConfig";
+import { getActiveBackendUrl } from "../constants/apiConfig";
 
 export default function StartDiagnosisPage() {
   const { width, height } = useWindowDimensions();
@@ -44,6 +44,7 @@ export default function StartDiagnosisPage() {
   useEffect(() => {
     const analyzeAndSaveReport = async () => {
       try {
+        const BACKEND_URL = await getActiveBackendUrl();
         const user = auth.currentUser;
         if (!user) {
           console.error("Cannot save: No user is currently logged in.");

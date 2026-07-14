@@ -3,17 +3,17 @@ import { router } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import {
-    Alert,
-    Platform,
-    Pressable,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    useColorScheme,
-    useWindowDimensions,
-    View,
+  Alert,
+  Platform,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  useColorScheme,
+  useWindowDimensions,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../config/firebaseConfig";
@@ -54,7 +54,7 @@ export default function LoginPage() {
       console.log("Logged in:", userCredential.user.email);
       showAlert("Success", "Welcome back!");
 
-      router.push("/dashboard_page");
+      router.replace("/dashboard_page");
     } catch (error: any) {
       console.error(error);
       if (error.code === "auth/invalid-credential") {

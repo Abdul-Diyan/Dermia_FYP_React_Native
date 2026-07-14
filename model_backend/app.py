@@ -471,6 +471,10 @@ def generate_gradcam_b64(input_tensor, original_image_pil, target_class):
     except Exception as e:
         return None
 
+@app.route('/', methods=['GET'])
+def health_check():
+    return jsonify({'status': 'Server is awake!'}), 200
+    
 @app.route('/predict', methods=['POST'])
 def predict():
     image_bytes = None
