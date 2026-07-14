@@ -45,3 +45,5 @@ app-example
 
 venv
 __pycache__
+
+/eas.json
